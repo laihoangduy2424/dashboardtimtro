@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockLandlords, Landlord } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Lock, Unlock, Trash2 } from 'lucide-react'
+import { Eye, Lock, Unlock } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function LandlordsPage() {
@@ -210,7 +210,7 @@ export default function LandlordsPage() {
         <DataTable<Landlord>
           data={filteredLandlords}
           columns={columns}
-          searchPlaceholder="Tìm theo tên công ty, người đại diện hoặc email..."
+          searchPlaceholder="Tìm theo tên công ty, ngư���i đại diện hoặc email..."
           searchableFields={['companyName', 'representativeName', 'email', 'phone']}
           onRowClick={handleViewDetails}
           actions={(landlord) => (
@@ -224,37 +224,6 @@ export default function LandlordsPage() {
               >
                 <Eye size={16} />
               </Button>
-              {landlord.status === 'active' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleSuspend(landlord)}
-                  className="text-orange-600 hover:text-orange-700"
-                  title="Khoá tài khoản"
-                >
-                  <Lock size={16} />
-                </Button>
-              )}
-              {landlord.status === 'suspended' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleActivate(landlord)}
-                  className="text-green-600 hover:text-green-700"
-                  title="Kích hoạt lại tài khoản"
-                >
-                  <Unlock size={16} />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(landlord)}
-                className="text-red-600 hover:text-red-700"
-                title="Xóa tài khoản"
-              >
-                <Trash2 size={16} />
-              </Button>
             </div>
           )}
         />
@@ -262,7 +231,7 @@ export default function LandlordsPage() {
 
       {/* Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Chi tiết tài khoản chủ nhà</DialogTitle>
             <DialogDescription>Xem và quản lý thông tin tài khoản khách hàng</DialogDescription>
@@ -366,11 +335,11 @@ export default function LandlordsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-4 border-t border-border">
                 {selectedLandlord.status === 'active' && (
                   <Button
                     onClick={() => handleSuspend(selectedLandlord)}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
                   >
                     <Lock size={16} className="mr-2" />
                     Khoá tài khoản
@@ -379,20 +348,12 @@ export default function LandlordsPage() {
                 {selectedLandlord.status === 'suspended' && (
                   <Button
                     onClick={() => handleActivate(selectedLandlord)}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Unlock size={16} className="mr-2" />
                     Kích hoạt lại
                   </Button>
                 )}
-                <Button
-                  onClick={() => handleDelete(selectedLandlord)}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Xóa tài khoản
-                </Button>
               </div>
             </div>
           )}
