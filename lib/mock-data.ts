@@ -134,6 +134,21 @@ export interface ChatbotResponseStyle {
   language: 'vi' | 'en'
 }
 
+export interface Conversation {
+  id: string
+  type: 'landlord_resident' | 'user_chatbot' | 'guest_listing_owner'
+  senderId: string
+  senderName: string
+  receiverId: string
+  receiverName: string
+  lastMessage: string
+  lastMessageTime: string
+  status: 'active' | 'pending_response' | 'handled' | 'locked' | 'violation'
+  messageCount: number
+  unreadCount: number
+  createdDate: string
+}
+
 // ==================== MOCK DATA ====================
 
 // Mock Landlords (SaaS Customers)
@@ -768,5 +783,79 @@ export const mockChatbotInteractions: ChatbotInteraction[] = [
     timestamp: '2024-02-16T11:15:00',
     status: 'escalated',
     userSatisfied: false,
+  },
+]
+
+// Mock Conversations
+export const mockConversations: Conversation[] = [
+  {
+    id: 'CONV001',
+    type: 'landlord_resident',
+    senderId: 'LL001',
+    senderName: 'Nguyễn Văn A',
+    receiverId: 'TN001',
+    receiverName: 'Trần Minh Khánh',
+    lastMessage: 'Ok, tôi sẽ kiểm tra và sửa chữa các hư hỏng trong tuần này',
+    lastMessageTime: '2024-02-16T14:30:00',
+    status: 'active',
+    messageCount: 12,
+    unreadCount: 0,
+    createdDate: '2024-01-22',
+  },
+  {
+    id: 'CONV002',
+    type: 'user_chatbot',
+    senderId: 'PU001',
+    senderName: 'Ngô Thị Hoa',
+    receiverId: 'BOT001',
+    receiverName: 'Chatbot',
+    lastMessage: 'Cảm ơn thông tin, tôi sẽ liên hệ chủ nhà ngay',
+    lastMessageTime: '2024-02-16T13:15:00',
+    status: 'handled',
+    messageCount: 5,
+    unreadCount: 0,
+    createdDate: '2024-02-16',
+  },
+  {
+    id: 'CONV003',
+    type: 'landlord_resident',
+    senderId: 'LL002',
+    senderName: 'Trần Thị B',
+    receiverId: 'TN002',
+    receiverName: 'Vương Thị Linh',
+    lastMessage: 'Chủ yêu cầu bạn thanh toán tiền điện trước ngày 20',
+    lastMessageTime: '2024-02-16T12:45:00',
+    status: 'pending_response',
+    messageCount: 8,
+    unreadCount: 1,
+    createdDate: '2023-11-18',
+  },
+  {
+    id: 'CONV004',
+    type: 'guest_listing_owner',
+    senderId: 'PU004',
+    senderName: 'Lý Quốc Anh',
+    receiverId: 'LL001',
+    receiverName: 'Nguyễn Văn A',
+    lastMessage: 'Tôi muốn hỏi thêm về các tiện nghi trong phòng',
+    lastMessageTime: '2024-02-16T11:20:00',
+    status: 'active',
+    messageCount: 3,
+    unreadCount: 1,
+    createdDate: '2024-02-16',
+  },
+  {
+    id: 'CONV005',
+    type: 'landlord_resident',
+    senderId: 'LL004',
+    senderName: 'Hoàng Thị D',
+    receiverId: 'TN003',
+    receiverName: 'Bùi Đức Hiệu',
+    lastMessage: 'Cảm ơn vì đã thuê phòng ở chúng tôi, chúc bạn may mắn',
+    lastMessageTime: '2024-02-10T15:00:00',
+    status: 'violation',
+    messageCount: 6,
+    unreadCount: 0,
+    createdDate: '2023-09-15',
   },
 ]
