@@ -27,6 +27,43 @@ export default function UsersPage() {
     console.log('Activating user:', user.id)
     // TODO: Call API to activate user
   }
+
+  const columns: Column<PublicUser>[] = [
+    {
+      header: 'ID',
+      accessor: 'id',
+      sortable: true,
+      className: 'w-24',
+    },
+    {
+      header: 'Tên',
+      accessor: 'name',
+      sortable: true,
+    },
+    {
+      header: 'Email',
+      accessor: 'email',
+      sortable: true,
+    },
+    {
+      header: 'Loại tài khoản',
+      accessor: 'accountType',
+      render: (value) => (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {value === 'landlord' ? 'Chủ nhà' : 'Cư dân'}
+        </span>
+      ),
+      sortable: true,
+    },
+    {
+      header: 'Quyền đăng bài',
+      accessor: 'postingPermission',
+      render: (value) => {
+        const labels: Record<string, string> = {
+          'room_rental': 'Phòng trọ',
+          'shared_room': 'Ở ghép',
+          'both': 'Cả hai',
+        }
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             {labels[value]}
@@ -51,21 +88,6 @@ export default function UsersPage() {
       sortable: true,
     },
   ]
-
-  const handleViewDetails = (user: PublicUser) => {
-    setSelectedUser(user)
-    setIsModalOpen(true)
-  }
-
-  const handleSuspend = (user: PublicUser) => {
-    console.log('Suspending user:', user.id)
-    // TODO: Call API to suspend user
-  }
-
-  const handleDelete = (user: PublicUser) => {
-    console.log('Deleting user:', user.id)
-    // TODO: Call API to delete user
-  }
 
   const getFilteredUsers = () => {
     if (filterStatus === 'all') {
