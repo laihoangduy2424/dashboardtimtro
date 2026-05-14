@@ -2,79 +2,56 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { StatusBadge } from '@/components/status-badge'
-import { FilterButton } from '@/components/filter-button'
-import { DataTable, Column } from '@/components/data-table'
 import { mockChatbotConfigs, mockChatbotDataSources, mockChatbotPatterns, mockChatbotInteractions, ChatbotConfig, ChatbotDataSource, ChatbotResponsePattern, ChatbotInteraction } from '@/lib/mock-data'
-import { Plus, Trash2, Edit, Power, PowerOff, Eye, ToggleLeft, ToggleRight } from 'lucide-react'
-
-type TabType = 'configs' | 'data-sources' | 'patterns' | 'interactions'
+import { Plus, Trash2, Edit, MessageCircle, Settings, Database, MessageSquare, Zap, ToggleLeft, ToggleRight } from 'lucide-react'
 
 export default function ChatbotManagementPage() {
   const [configs, setConfigs] = useState<ChatbotConfig[]>(mockChatbotConfigs)
   const [dataSources, setDataSources] = useState<ChatbotDataSource[]>(mockChatbotDataSources)
   const [patterns, setPatterns] = useState<ChatbotResponsePattern[]>(mockChatbotPatterns)
-  const [interactions] = useState<ChatbotInteraction[]>(mockChatbotInteractions)
-  
-  const [activeTab, setActiveTab] = useState<TabType>('configs')
-  const [selectedConfig, setSelectedConfig] = useState<ChatbotConfig | null>(null)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
-  
-  // Filter states
+  const [interactions, setInteractions] = useState<ChatbotInteraction[]>(mockChatbotInteractions)
+  const [selectedConfig, setSelectedConfig] = useState<ChatbotConfig | null>(configs[0] || null)
   const [filterPlatform, setFilterPlatform] = useState<'all' | 'public_listing' | 'resident_app'>('all')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'paused' | 'maintenance'>('all')
-  const [filterInteractionStatus, setFilterInteractionStatus] = useState<'all' | 'resolved' | 'pending' | 'escalated'>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'resolved' | 'pending' | 'escalated'>('all')
 
-  // Form states for new data source
+  // State for adding new items
   const [newDataSourceName, setNewDataSourceName] = useState('')
   const [newDataSourceType, setNewDataSourceType] = useState<'listing_info' | 'faq' | 'rules' | 'resident_info' | 'system_notification' | 'custom'>('custom')
   const [newDataSourceContent, setNewDataSourceContent] = useState('')
-  const [newDataSourceConfigId, setNewDataSourceConfigId] = useState('')
-
-  // Form states for new pattern
   const [newPatternTrigger, setNewPatternTrigger] = useState('')
   const [newPatternResponse, setNewPatternResponse] = useState('')
-  const [newPatternConfigId, setNewPatternConfigId] = useState('')
+  const [selectedResponseStyle, setSelectedResponseStyle] = useState<'friendly' | 'professional' | 'concise'>('friendly')
+  const [selectedResponseLength, setSelectedResponseLength] = useState<'short' | 'medium' | 'long'>('medium')
 
-  // Filtered data
-  const filteredConfigs = configs.filter(config => {
-    if (filterPlatform !== 'all' && config.platform !== filterPlatform) return false
-    if (filterStatus !== 'all' && config.status !== filterStatus) return false
-    return true
+  if (!selectedConfig) return null
+
+  const configDataSources = dataSources.filter(ds => ds.configId === selectedConfig.id)
+  const configPatterns = patterns.filter(p => p.configId === selectedConfig.id)
+  const configInteractions = interactions.filter(i => i.configId === selectedConfig.id)
+
+  const filteredInteractions = configInteractions.filter(i => {
+    let match = true
+    if (filterStatus !== 'all') match = match && i.status === filterStatus
+    return match
   })
-
-  const filteredInteractions = interactions.filter(i => {
-    if (filterInteractionStatus !== 'all' && i.status !== filterInteractionStatus) return false
-    return true
-  })
-
-  // Handlers
-  const handleToggleConfigStatus = (id: string) => {
-    setConfigs(configs.map(c => 
-      c.id === id ? { ...c, status: c.status === 'active' ? 'paused' : 'active' } : c
-    ))
-  }
-
-  const handleDeleteConfig = (id: string) => {
-    setConfigs(configs.filter(c => c.id !== id))
-    setDataSources(dataSources.filter(ds => ds.configId !== id))
-    setPatterns(patterns.filter(p => p.configId !== id))
-  }
 
   const handleAddDataSource = () => {
-    if (newDataSourceName.trim() && newDataSourceContent.trim() && newDataSourceConfigId) {
+    if (newDataSourceName.trim() && newDataSourceContent.trim()) {
       const newSource: ChatbotDataSource = {
-        id: `DS${Date.now()}`,
-        configId: newDataSourceConfigId,
+        id: `DS${dataSources.length + 1}`,
+        configId: selectedConfig.id,
         name: newDataSourceName,
         type: newDataSourceType,
         enabled: true,
-        priority: dataSources.filter(ds => ds.configId === newDataSourceConfigId).length + 1,
+        priority: configDataSources.length + 1,
         content: newDataSourceContent,
         createdDate: new Date().toISOString().split('T')[0],
         updatedDate: new Date().toISOString().split('T')[0],
@@ -82,7 +59,6 @@ export default function ChatbotManagementPage() {
       setDataSources([...dataSources, newSource])
       setNewDataSourceName('')
       setNewDataSourceContent('')
-      setNewDataSourceConfigId('')
     }
   }
 
@@ -95,19 +71,18 @@ export default function ChatbotManagementPage() {
   }
 
   const handleAddPattern = () => {
-    if (newPatternTrigger.trim() && newPatternResponse.trim() && newPatternConfigId) {
+    if (newPatternTrigger.trim() && newPatternResponse.trim()) {
       const newPattern: ChatbotResponsePattern = {
-        id: `RP${Date.now()}`,
-        configId: newPatternConfigId,
+        id: `RP${patterns.length + 1}`,
+        configId: selectedConfig.id,
         trigger: newPatternTrigger,
         response: newPatternResponse,
-        priority: patterns.filter(p => p.configId === newPatternConfigId).length + 1,
+        priority: configPatterns.length + 1,
         enabled: true,
       }
       setPatterns([...patterns, newPattern])
       setNewPatternTrigger('')
       setNewPatternResponse('')
-      setNewPatternConfigId('')
     }
   }
 
@@ -119,416 +94,423 @@ export default function ChatbotManagementPage() {
     setPatterns(patterns.filter(p => p.id !== id))
   }
 
-  // Table columns for configs
-  const configColumns: Column<ChatbotConfig>[] = [
-    { key: 'id', header: 'Mã', sortable: true },
-    { key: 'name', header: 'Tên Chatbot', sortable: true },
-    { 
-      key: 'platform', 
-      header: 'Nền tảng',
-      render: (config) => (
-        <span className="text-sm">
-          {config.platform === 'public_listing' ? 'Web Tin Đăng' : 'App Cư Dân'}
-        </span>
-      )
-    },
-    {
-      key: 'status',
-      header: 'Trạng thái',
-      render: (config) => (
-        <StatusBadge
-          status={config.status}
-          variant={config.status === 'active' ? 'success' : config.status === 'paused' ? 'warning' : 'default'}
-        />
-      )
-    },
-    { key: 'updatedDate', header: 'Cập nhật', sortable: true },
-    {
-      key: 'actions',
-      header: 'Thao tác',
-      render: (config) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => { setSelectedConfig(config); setIsDetailOpen(true) }}
-          >
-            <Eye size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleToggleConfigStatus(config.id)}
-            className={config.status === 'active' ? 'text-orange-600' : 'text-green-600'}
-          >
-            {config.status === 'active' ? <PowerOff size={16} /> : <Power size={16} />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeleteConfig(config.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-      )
-    }
-  ]
-
-  // Table columns for data sources
-  const dataSourceColumns: Column<ChatbotDataSource>[] = [
-    { key: 'id', header: 'Mã', sortable: true },
-    { key: 'name', header: 'Tên nguồn', sortable: true },
-    {
-      key: 'configId',
-      header: 'Chatbot',
-      render: (ds) => configs.find(c => c.id === ds.configId)?.name || ds.configId
-    },
-    {
-      key: 'type',
-      header: 'Loại',
-      render: (ds) => (
-        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-          {ds.type}
-        </span>
-      )
-    },
-    {
-      key: 'enabled',
-      header: 'Kích hoạt',
-      render: (ds) => (
-        <button onClick={() => handleToggleDataSource(ds.id)}>
-          {ds.enabled ? <ToggleRight size={24} className="text-green-600" /> : <ToggleLeft size={24} className="text-muted-foreground" />}
-        </button>
-      )
-    },
-    { key: 'priority', header: 'Ưu tiên', sortable: true },
-    {
-      key: 'actions',
-      header: 'Thao tác',
-      render: (ds) => (
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm"><Edit size={16} /></Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeleteDataSource(ds.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-      )
-    }
-  ]
-
-  // Table columns for patterns
-  const patternColumns: Column<ChatbotResponsePattern>[] = [
-    { key: 'id', header: 'Mã', sortable: true },
-    {
-      key: 'trigger',
-      header: 'Từ khóa',
-      render: (p) => (
-        <code className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800">
-          {p.trigger}
-        </code>
-      )
-    },
-    {
-      key: 'configId',
-      header: 'Chatbot',
-      render: (p) => configs.find(c => c.id === p.configId)?.name || p.configId
-    },
-    {
-      key: 'response',
-      header: 'Câu trả lời',
-      render: (p) => (
-        <span className="text-sm truncate max-w-xs block">{p.response}</span>
-      )
-    },
-    {
-      key: 'enabled',
-      header: 'Kích hoạt',
-      render: (p) => (
-        <button onClick={() => handleTogglePattern(p.id)}>
-          {p.enabled ? <ToggleRight size={24} className="text-green-600" /> : <ToggleLeft size={24} className="text-muted-foreground" />}
-        </button>
-      )
-    },
-    {
-      key: 'actions',
-      header: 'Thao tác',
-      render: (p) => (
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm"><Edit size={16} /></Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeletePattern(p.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-      )
-    }
-  ]
-
-  // Table columns for interactions
-  const interactionColumns: Column<ChatbotInteraction>[] = [
-    { key: 'id', header: 'Mã', sortable: true },
-    { key: 'userMessage', header: 'Câu hỏi', render: (i) => <span className="truncate max-w-xs block text-sm">{i.userMessage}</span> },
-    { key: 'botResponse', header: 'Phản hồi', render: (i) => <span className="truncate max-w-xs block text-sm">{i.botResponse}</span> },
-    {
-      key: 'platform',
-      header: 'Nền tảng',
-      render: (i) => i.platform === 'public_listing' ? 'Web' : 'App'
-    },
-    {
-      key: 'status',
-      header: 'Trạng thái',
-      render: (i) => (
-        <StatusBadge
-          status={i.status}
-          variant={i.status === 'resolved' ? 'success' : i.status === 'pending' ? 'warning' : 'destructive'}
-        />
-      )
-    },
-    {
-      key: 'timestamp',
-      header: 'Thời gian',
-      sortable: true,
-      render: (i) => new Date(i.timestamp).toLocaleString('vi-VN')
-    },
-  ]
-
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Quản lý Chatbot</h1>
+        <p className="mt-1 text-muted-foreground">Cấu hình và quản lý chatbot trên các nền tảng</p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 border-b border-border pb-4">
-        <FilterButton
-          label="Cấu hình Chatbot"
-          count={configs.length}
-          isActive={activeTab === 'configs'}
-          onClick={() => setActiveTab('configs')}
-        />
-        <FilterButton
-          label="Nguồn dữ liệu"
-          count={dataSources.length}
-          isActive={activeTab === 'data-sources'}
-          onClick={() => setActiveTab('data-sources')}
-        />
-        <FilterButton
-          label="Mẫu trả lời"
-          count={patterns.length}
-          isActive={activeTab === 'patterns'}
-          onClick={() => setActiveTab('patterns')}
-        />
-        <FilterButton
-          label="Lịch sử hội thoại"
-          count={interactions.length}
-          isActive={activeTab === 'interactions'}
-          onClick={() => setActiveTab('interactions')}
-        />
-      </div>
-
-      {/* Configs Tab */}
-      {activeTab === 'configs' && (
-        <>
-          <div className="flex flex-wrap gap-2">
-            <FilterButton label="Tất cả" count={configs.length} isActive={filterPlatform === 'all' && filterStatus === 'all'} onClick={() => { setFilterPlatform('all'); setFilterStatus('all') }} />
-            <FilterButton label="Web Tin Đăng" count={configs.filter(c => c.platform === 'public_listing').length} isActive={filterPlatform === 'public_listing'} onClick={() => setFilterPlatform('public_listing')} />
-            <FilterButton label="App Cư Dân" count={configs.filter(c => c.platform === 'resident_app').length} isActive={filterPlatform === 'resident_app'} onClick={() => setFilterPlatform('resident_app')} />
-            <FilterButton label="Hoạt động" count={configs.filter(c => c.status === 'active').length} isActive={filterStatus === 'active'} onClick={() => setFilterStatus('active')} />
-            <FilterButton label="Tạm dừng" count={configs.filter(c => c.status === 'paused').length} isActive={filterStatus === 'paused'} onClick={() => setFilterStatus('paused')} />
-          </div>
-          <div className="rounded-lg border border-border bg-card">
-            <DataTable columns={configColumns} data={filteredConfigs} />
-          </div>
-        </>
-      )}
-
-      {/* Data Sources Tab */}
-      {activeTab === 'data-sources' && (
-        <>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              <FilterButton label="Tất cả" count={dataSources.length} isActive={true} onClick={() => {}} />
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus size={16} />
-                  Thêm nguồn dữ liệu
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Thêm Nguồn Dữ liệu Mới</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
+      {/* Config Selection */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Settings size={20} />
+            Cấu hình Chatbot
+          </CardTitle>
+          <CardDescription>Chọn nền tảng để cấu hình</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {configs.map(config => (
+              <button
+                key={config.id}
+                onClick={() => setSelectedConfig(config)}
+                className={`p-4 rounded-lg border-2 text-left transition-all ${
+                  selectedConfig?.id === config.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                <div className="flex items-start justify-between">
                   <div>
-                    <Label>Chọn Chatbot</Label>
-                    <Select value={newDataSourceConfigId} onValueChange={setNewDataSourceConfigId}>
-                      <SelectTrigger><SelectValue placeholder="Chọn chatbot" /></SelectTrigger>
-                      <SelectContent>
-                        {configs.map(c => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <h3 className="font-semibold text-foreground">{config.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{config.description}</p>
+                    <div className="mt-2">
+                      <StatusBadge
+                        status={config.status}
+                        variant={config.status === 'active' ? 'success' : 'warning'}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Tên Nguồn</Label>
-                    <Input value={newDataSourceName} onChange={(e) => setNewDataSourceName(e.target.value)} placeholder="VD: Thông tin tiện ích" />
-                  </div>
-                  <div>
-                    <Label>Loại Nguồn</Label>
-                    <Select value={newDataSourceType} onValueChange={(v: typeof newDataSourceType) => setNewDataSourceType(v)}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="listing_info">Thông tin bài đăng</SelectItem>
-                        <SelectItem value="faq">FAQ</SelectItem>
-                        <SelectItem value="rules">Nội quy</SelectItem>
-                        <SelectItem value="resident_info">Thông tin cư dân</SelectItem>
-                        <SelectItem value="system_notification">Thông báo hệ thống</SelectItem>
-                        <SelectItem value="custom">Tùy chỉnh</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Nội dung</Label>
-                    <Textarea value={newDataSourceContent} onChange={(e) => setNewDataSourceContent(e.target.value)} placeholder="Mô tả nội dung nguồn dữ liệu..." rows={4} />
-                  </div>
-                  <Button onClick={handleAddDataSource} className="w-full">Thêm Nguồn</Button>
+                  <span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+                    {config.platform === 'public_listing' ? 'Web Tin Đăng' : 'App Cư Dân'}
+                  </span>
                 </div>
-              </DialogContent>
-            </Dialog>
+              </button>
+            ))}
           </div>
-          <div className="rounded-lg border border-border bg-card">
-            <DataTable columns={dataSourceColumns} data={dataSources} />
-          </div>
-        </>
-      )}
+        </CardContent>
+      </Card>
 
-      {/* Patterns Tab */}
-      {activeTab === 'patterns' && (
-        <>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              <FilterButton label="Tất cả" count={patterns.length} isActive={true} onClick={() => {}} />
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus size={16} />
-                  Thêm mẫu trả lời
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Thêm Mẫu Trả Lời</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label>Chọn Chatbot</Label>
-                    <Select value={newPatternConfigId} onValueChange={setNewPatternConfigId}>
-                      <SelectTrigger><SelectValue placeholder="Chọn chatbot" /></SelectTrigger>
-                      <SelectContent>
-                        {configs.map(c => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Từ khóa kích hoạt (cách nhau bằng |)</Label>
-                    <Input value={newPatternTrigger} onChange={(e) => setNewPatternTrigger(e.target.value)} placeholder="VD: giá|chi phí|bao nhiêu" />
-                  </div>
-                  <div>
-                    <Label>Câu trả lời</Label>
-                    <Textarea value={newPatternResponse} onChange={(e) => setNewPatternResponse(e.target.value)} placeholder="Nhập câu trả lời cho các từ khóa trên..." rows={4} />
-                  </div>
-                  <Button onClick={handleAddPattern} className="w-full">Thêm Mẫu</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="rounded-lg border border-border bg-card">
-            <DataTable columns={patternColumns} data={patterns} />
-          </div>
-        </>
-      )}
+      {/* Tabs for Different Sections */}
+      <Tabs defaultValue="data-sources" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="data-sources" className="flex items-center gap-2">
+            <Database size={16} />
+            <span className="hidden sm:inline">Dữ liệu</span>
+          </TabsTrigger>
+          <TabsTrigger value="patterns" className="flex items-center gap-2">
+            <Zap size={16} />
+            <span className="hidden sm:inline">Mẫu</span>
+          </TabsTrigger>
+          <TabsTrigger value="response-style" className="flex items-center gap-2">
+            <MessageCircle size={16} />
+            <span className="hidden sm:inline">Phong cách</span>
+          </TabsTrigger>
+          <TabsTrigger value="interactions" className="flex items-center gap-2">
+            <MessageSquare size={16} />
+            <span className="hidden sm:inline">Lịch sử</span>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Interactions Tab */}
-      {activeTab === 'interactions' && (
-        <>
-          <div className="flex flex-wrap gap-2">
-            <FilterButton label="Tất cả" count={interactions.length} isActive={filterInteractionStatus === 'all'} onClick={() => setFilterInteractionStatus('all')} />
-            <FilterButton label="Đã xử lý" count={interactions.filter(i => i.status === 'resolved').length} isActive={filterInteractionStatus === 'resolved'} onClick={() => setFilterInteractionStatus('resolved')} />
-            <FilterButton label="Chờ xử lý" count={interactions.filter(i => i.status === 'pending').length} isActive={filterInteractionStatus === 'pending'} onClick={() => setFilterInteractionStatus('pending')} />
-            <FilterButton label="Cần leo thang" count={interactions.filter(i => i.status === 'escalated').length} isActive={filterInteractionStatus === 'escalated'} onClick={() => setFilterInteractionStatus('escalated')} />
-          </div>
-          <div className="rounded-lg border border-border bg-card">
-            <DataTable columns={interactionColumns} data={filteredInteractions} />
-          </div>
-        </>
-      )}
+        {/* Data Sources Tab */}
+        <TabsContent value="data-sources" className="space-y-4">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-lg">Quản lý Nguồn Dữ liệu</CardTitle>
+              <CardDescription>Chọn và ưu tiên các nguồn dữ liệu cho chatbot</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Existing Data Sources */}
+              <div className="space-y-3">
+                {configDataSources.map(source => (
+                  <div key={source.id} className="p-4 rounded-lg border border-border bg-muted/30 flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleToggleDataSource(source.id)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          {source.enabled ? <ToggleRight size={24} className="text-green-600" /> : <ToggleLeft size={24} />}
+                        </button>
+                        <div>
+                          <h4 className="font-semibold text-foreground">{source.name}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{source.content}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
+                              {source.type}
+                            </span>
+                            <span className="text-xs text-muted-foreground">Ưu tiên: {source.priority}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteDataSource(source.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
 
-      {/* Config Detail Modal */}
-      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Chi tiết Chatbot</DialogTitle>
-          </DialogHeader>
-          {selectedConfig && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              {/* Add New Data Source */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full gap-2">
+                    <Plus size={16} />
+                    Thêm Nguồn Dữ liệu
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Thêm Nguồn Dữ liệu Mới</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="ds-name">Tên Nguồn</Label>
+                      <Input
+                        id="ds-name"
+                        value={newDataSourceName}
+                        onChange={(e) => setNewDataSourceName(e.target.value)}
+                        placeholder="VD: Thông tin tiện ích"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ds-type">Loại Nguồn</Label>
+                      <Select value={newDataSourceType} onValueChange={(value: any) => setNewDataSourceType(value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="listing_info">Thông tin bài đăng</SelectItem>
+                          <SelectItem value="faq">FAQ</SelectItem>
+                          <SelectItem value="rules">Nội quy</SelectItem>
+                          <SelectItem value="resident_info">Thông tin cư dân</SelectItem>
+                          <SelectItem value="system_notification">Thông báo hệ thống</SelectItem>
+                          <SelectItem value="custom">Tùy chỉnh</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="ds-content">Nội dung</Label>
+                      <Textarea
+                        id="ds-content"
+                        value={newDataSourceContent}
+                        onChange={(e) => setNewDataSourceContent(e.target.value)}
+                        placeholder="Mô tả nội dung nguồn dữ liệu..."
+                        rows={4}
+                      />
+                    </div>
+                    <Button onClick={handleAddDataSource} className="w-full">
+                      Thêm Nguồn
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Response Patterns Tab */}
+        <TabsContent value="patterns" className="space-y-4">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-lg">Quản lý Câu Trả Lời Mẫu</CardTitle>
+              <CardDescription>Tạo các câu trả lời cố định cho những câu hỏi phổ biến</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Existing Patterns */}
+              <div className="space-y-3">
+                {configPatterns.map(pattern => (
+                  <div key={pattern.id} className="p-4 rounded-lg border border-border bg-muted/30">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <button
+                            onClick={() => handleTogglePattern(pattern.id)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            {pattern.enabled ? <ToggleRight size={20} className="text-green-600" /> : <ToggleLeft size={20} />}
+                          </button>
+                          <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 font-mono text-sm">
+                            {pattern.trigger}
+                          </span>
+                          <span className="text-xs text-muted-foreground">Ưu tiên: {pattern.priority}</span>
+                        </div>
+                        <p className="text-sm text-foreground mt-2">{pattern.response}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePattern(pattern.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Pattern */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full gap-2">
+                    <Plus size={16} />
+                    Thêm Câu Trả Lời Mẫu
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Thêm Câu Trả Lời Mẫu</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="pattern-trigger">Từ khóa Kích Hoạt (cách nhau bằng |)</Label>
+                      <Input
+                        id="pattern-trigger"
+                        value={newPatternTrigger}
+                        onChange={(e) => setNewPatternTrigger(e.target.value)}
+                        placeholder="VD: giá|chi phí|bao nhiêu"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="pattern-response">Câu Trả Lời</Label>
+                      <Textarea
+                        id="pattern-response"
+                        value={newPatternResponse}
+                        onChange={(e) => setNewPatternResponse(e.target.value)}
+                        placeholder="Nhập câu trả lời cho các từ khóa trên..."
+                        rows={4}
+                      />
+                    </div>
+                    <Button onClick={handleAddPattern} className="w-full">
+                      Thêm Mẫu
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Response Style Tab */}
+        <TabsContent value="response-style" className="space-y-4">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-lg">Thiết Lập Phong Cách Trả Lời</CardTitle>
+              <CardDescription>Tùy chỉnh cách chatbot giao tiếp với người dùng</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Response Style */}
                 <div>
-                  <Label className="text-muted-foreground">Mã</Label>
-                  <p className="font-medium">{selectedConfig.id}</p>
+                  <Label className="text-base font-semibold mb-3 block">Phong Cách Giao Tiếp</Label>
+                  <div className="space-y-2">
+                    {[
+                      { value: 'friendly', label: 'Thân Thiện', description: 'Thoải mái, vui vẻ' },
+                      { value: 'professional', label: 'Chuyên Nghiệp', description: 'Chính thức, chuẩn mực' },
+                      { value: 'concise', label: 'Ngắn Gọn', description: 'Tập trung, hiệu quả' },
+                    ].map(style => (
+                      <button
+                        key={style.value}
+                        onClick={() => setSelectedResponseStyle(style.value as any)}
+                        className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                          selectedResponseStyle === style.value
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <p className="font-semibold text-foreground">{style.label}</p>
+                        <p className="text-sm text-muted-foreground">{style.description}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Response Length */}
                 <div>
-                  <Label className="text-muted-foreground">Tên</Label>
-                  <p className="font-medium">{selectedConfig.name}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Nền tảng</Label>
-                  <p className="font-medium">{selectedConfig.platform === 'public_listing' ? 'Web Tin Đăng' : 'App Cư Dân'}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Trạng thái</Label>
-                  <StatusBadge status={selectedConfig.status} variant={selectedConfig.status === 'active' ? 'success' : 'warning'} />
+                  <Label className="text-base font-semibold mb-3 block">Độ Dài Phản Hồi</Label>
+                  <div className="space-y-2">
+                    {[
+                      { value: 'short', label: 'Ngắn', description: '1-2 câu' },
+                      { value: 'medium', label: 'Vừa', description: '2-3 câu' },
+                      { value: 'long', label: 'Dài', description: '3+ câu' },
+                    ].map(length => (
+                      <button
+                        key={length.value}
+                        onClick={() => setSelectedResponseLength(length.value as any)}
+                        className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                          selectedResponseLength === length.value
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <p className="font-semibold text-foreground">{length.label}</p>
+                        <p className="text-sm text-muted-foreground">{length.description}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <Label className="text-muted-foreground">Mô tả</Label>
-                <p className="font-medium">{selectedConfig.description}</p>
-              </div>
-              <div>
-                <Label className="text-muted-foreground">Lời chào mặc định</Label>
-                <p className="font-medium italic">"{selectedConfig.defaultGreeting}"</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-muted-foreground">Nguồn dữ liệu</Label>
-                  <p className="font-medium">{dataSources.filter(ds => ds.configId === selectedConfig.id).length} nguồn</p>
+
+              {/* Example Responses */}
+              <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border">
+                <h4 className="font-semibold text-foreground mb-3">Ví dụ Phản Hồi</h4>
+                <div className="space-y-2">
+                  <div className="p-3 bg-background rounded border border-border">
+                    <p className="text-sm font-medium text-muted-foreground">Người dùng:</p>
+                    <p className="text-foreground">Phòng này bao nhiêu tiền một tháng?</p>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-sm font-medium text-blue-600">Chatbot ({selectedResponseStyle}):</p>
+                    <p className="text-foreground">
+                      {selectedResponseStyle === 'friendly'
+                        ? '😊 Giá của phòng này là 3 triệu VND mỗi tháng, bao gồm tiền điện, nước và internet nhé!'
+                        : selectedResponseStyle === 'professional'
+                          ? 'Giá thuê phòng là 3,000,000 VND/tháng, bao gồm tiền điện, nước và dịch vụ internet.'
+                          : 'Giá: 3 triệu VND/tháng (gồm điện, nước, internet)'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <Label className="text-muted-foreground">Mẫu trả lời</Label>
-                  <p className="font-medium">{patterns.filter(p => p.configId === selectedConfig.id).length} mẫu</p>
-                </div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Interaction History Tab */}
+        <TabsContent value="interactions" className="space-y-4">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-lg">Lịch Sử Hội Thoại</CardTitle>
+              <CardDescription>Theo dõi các cuộc trò chuyện giữa người dùng và chatbot</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Filters */}
+              <div className="flex flex-wrap gap-2">
+                <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                    <SelectItem value="resolved">Đã xử lý</SelectItem>
+                    <SelectItem value="pending">Chờ xử lý</SelectItem>
+                    <SelectItem value="escalated">Chuyển tiếp</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Interactions List */}
+              <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                {filteredInteractions.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Không có cuộc hội thoại nào
+                  </div>
+                ) : (
+                  filteredInteractions.map(interaction => (
+                    <div key={interaction.id} className="p-4 rounded-lg border border-border bg-muted/30 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">User: {interaction.userId}</span>
+                          <StatusBadge
+                            status={interaction.status}
+                            variant={
+                              interaction.status === 'resolved'
+                                ? 'success'
+                                : interaction.status === 'escalated'
+                                  ? 'error'
+                                  : 'warning'
+                            }
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(interaction.timestamp).toLocaleString('vi-VN')}
+                        </span>
+                      </div>
+
+                      <div className="bg-background p-3 rounded border border-border">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Câu hỏi:</p>
+                        <p className="text-sm text-foreground">{interaction.userMessage}</p>
+                      </div>
+
+                      <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                        <p className="text-xs font-medium text-blue-600 mb-1">Trả lời:</p>
+                        <p className="text-sm text-foreground">{interaction.botResponse}</p>
+                      </div>
+
+                      {interaction.userSatisfied !== undefined && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-muted-foreground">Người dùng hài lòng:</span>
+                          <span className={interaction.userSatisfied ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                            {interaction.userSatisfied ? '✓ Có' : '✗ Không'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
