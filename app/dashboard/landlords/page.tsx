@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockLandlords, Landlord } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Lock, Unlock } from 'lucide-react'
+import { Lock, Unlock } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function LandlordsPage() {
@@ -210,22 +210,9 @@ export default function LandlordsPage() {
         <DataTable<Landlord>
           data={filteredLandlords}
           columns={columns}
-          searchPlaceholder="Tìm theo tên công ty, ngư���i đại diện hoặc email..."
+          searchPlaceholder="Tìm theo tên công ty, người đại diện hoặc email..."
           searchableFields={['companyName', 'representativeName', 'email', 'phone']}
           onRowClick={handleViewDetails}
-          actions={(landlord) => (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleViewDetails(landlord)}
-                className="text-muted-foreground hover:text-foreground"
-                title="Xem chi tiết"
-              >
-                <Eye size={16} />
-              </Button>
-            </div>
-          )}
         />
       </div>
 

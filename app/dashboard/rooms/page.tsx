@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockRooms, Room } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Check, X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 
 export default function RoomsPage() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
@@ -186,19 +186,6 @@ export default function RoomsPage() {
           searchPlaceholder="Tìm tin theo tiêu đề hoặc địa chỉ..."
           searchableFields={['title', 'address', 'landlordName', 'building']}
           onRowClick={handleViewDetails}
-          actions={(room) => (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleViewDetails(room)}
-                className="text-muted-foreground hover:text-foreground"
-                title="Xem chi tiết"
-              >
-                <Eye size={16} />
-              </Button>
-            </div>
-          )}
         />
       </div>
 

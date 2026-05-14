@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockPublicUsers, PublicUser } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 
 export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null)
@@ -146,19 +146,6 @@ export default function UsersPage() {
           searchPlaceholder="Tìm người dùng theo tên hoặc email..."
           searchableFields={['name', 'email', 'phone']}
           onRowClick={handleViewDetails}
-          actions={(user) => (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleViewDetails(user)}
-                className="text-muted-foreground hover:text-foreground"
-                title="Xem chi tiết"
-              >
-                <Eye size={16} />
-              </Button>
-            </div>
-          )}
         />
       </div>
 
