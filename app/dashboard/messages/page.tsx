@@ -312,6 +312,20 @@ export default function MessagesPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-4 border-t border-border">
+                <Button
+                  onClick={() => {
+                    // TODO: Navigate to full conversation view or open conversation thread panel
+                    console.log('View full conversation:', selectedConversation.id)
+                  }}
+                  className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  <MessageCircle size={16} className="mr-2" />
+                  Xem toàn bộ cuộc hội thoại
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
