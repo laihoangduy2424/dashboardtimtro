@@ -12,6 +12,8 @@ import { formatCurrency } from '@/lib/utils'
 export default function LandlordsPage() {
   const [selectedLandlord, setSelectedLandlord] = useState<Landlord | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'suspended' | 'expired'>('all')
+  const [filterTier, setFilterTier] = useState<'all' | 'basic' | 'pro' | 'enterprise'>('all')
 
   const columns: Column<Landlord>[] = [
     {
@@ -93,6 +95,22 @@ export default function LandlordsPage() {
     // TODO: Call API to delete landlord
   }
 
+  const getFilteredLandlords = () => {
+    let result = mockLandlords
+    
+    if (filterStatus !== 'all') {
+      result = result.filter(l => l.status === filterStatus)
+    }
+    
+    if (filterTier !== 'all') {
+      result = result.filter(l => l.serviceTier === filterTier)
+    }
+    
+    return result
+  }
+
+  const filteredLandlords = getFilteredLandlords()
+
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -101,10 +119,96 @@ export default function LandlordsPage() {
         <p className="mt-1 text-muted-foreground"></p>
       </div>
 
-      {/* Data Table */}
+      {/* Filters */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setFilterStatus('all')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterStatus === 'all'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Tất cả ({mockLandlords.length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('active')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterStatus === 'active'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Hoạt động ({mockLandlords.filter(l => l.status === 'active').length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('suspended')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterStatus === 'suspended'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Khoá ({mockLandlords.filter(l => l.status === 'suspended').length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('expired')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterStatus === 'expired'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Hết hạn ({mockLandlords.filter(l => l.status === 'expired').length})
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setFilterTier('all')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterTier === 'all'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Tất cả gói
+          </button>
+          <button
+            onClick={() => setFilterTier('basic')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterTier === 'basic'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Basic ({mockLandlords.filter(l => l.serviceTier === 'basic').length})
+          </button>
+          <button
+            onClick={() => setFilterTier('pro')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterTier === 'pro'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Pro ({mockLandlords.filter(l => l.serviceTier === 'pro').length})
+          </button>
+          <button
+            onClick={() => setFilterTier('enterprise')}
+            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+              filterTier === 'enterprise'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border bg-card hover:border-primary/50'
+            }`}
+          >
+            Enterprise ({mockLandlords.filter(l => l.serviceTier === 'enterprise').length})
+          </button>
+        </div>
+      </div>
       <div className="rounded-lg border border-border bg-card p-6">
         <DataTable<Landlord>
-          data={mockLandlords}
+          data={filteredLandlords}
           columns={columns}
           searchPlaceholder="Tìm theo tên công ty, người đại diện hoặc email..."
           searchableFields={['companyName', 'representativeName', 'email', 'phone']}
