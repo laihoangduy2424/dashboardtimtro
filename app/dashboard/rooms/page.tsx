@@ -338,6 +338,12 @@ export default function RoomsPage() {
                         <X size={16} className="mr-2" />
                         Không duyệt
                       </Button>
+                      <Button
+                        onClick={() => handleHide(selectedRoom)}
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                      >
+                        Ẩn trạng thái công khai
+                      </Button>
                     </>
                   )}
                   {selectedRoom.publicStatus === 'displaying' && (
@@ -345,7 +351,7 @@ export default function RoomsPage() {
                       onClick={() => handleHide(selectedRoom)}
                       className="bg-orange-600 hover:bg-orange-700 text-white"
                     >
-                      Ẩn
+                      Ẩn trạng thái công khai
                     </Button>
                   )}
                   {selectedRoom.publicStatus === 'hidden' && (
@@ -353,7 +359,7 @@ export default function RoomsPage() {
                       onClick={() => handleShow(selectedRoom)}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      Hiển thị
+                      Hiển thị trạng thái công khai
                     </Button>
                   )}
                 </div>
