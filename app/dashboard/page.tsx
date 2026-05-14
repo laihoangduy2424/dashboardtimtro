@@ -10,8 +10,8 @@ export default function DashboardHome() {
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Tổng quan hệ thống</h1>
-        <p className="mt-1 text-muted-foreground">Quản trị nền tảng - Tình trạng hệ thống và chỉ số chính</p>
+        <h1 className="text-3xl font-bold text-foreground"></h1>
+        <p className="mt-1 text-muted-foreground"></p>
       </div>
 
       {/* Key Statistics Grid */}
