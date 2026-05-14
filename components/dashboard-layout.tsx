@@ -18,11 +18,8 @@ const primaryNav: NavItem[] = [
   { name: 'Tin đăng', href: '/dashboard/rooms' },
   { name: 'Người dùng', href: '/dashboard/users' },
   { name: 'Tin nhắn', href: '/dashboard/messages', icon: Mail },
+  { name: 'Chatbot', href: '/dashboard/chatbot', icon: MessageSquare },
   { name: 'Báo cáo', href: '/dashboard/reports' },
-]
-
-const secondaryNav: NavItem[] = [
-  { name: 'Quản lý Chatbot', href: '/dashboard/rooms/chatbot', icon: MessageSquare },
 ]
 
 function NavLink({ 
@@ -98,16 +95,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 isActive={isNavActive(pathname, item.href)}
               />
             ))}
-            
-            <div className="h-6 w-px bg-border mx-2" aria-hidden="true" />
-            
-            {secondaryNav.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={isNavActive(pathname, item.href)}
-              />
-            ))}
           </nav>
         </div>
 
@@ -122,17 +109,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 onClick={closeMobileMenu}
               />
             ))}
-            
-            <div className="border-t border-border pt-2 mt-2 space-y-2">
-              {secondaryNav.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  isActive={isNavActive(pathname, item.href)}
-                  onClick={closeMobileMenu}
-                />
-              ))}
-            </div>
           </nav>
         )}
       </header>
