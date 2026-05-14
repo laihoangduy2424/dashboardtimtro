@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockPublicUsers, PublicUser } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FilterButton } from '@/components/filter-button'
 import { Lock } from 'lucide-react'
 
 export default function UsersPage() {
@@ -108,36 +109,24 @@ export default function UsersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        <button
+        <FilterButton
+          label="Tất cả"
+          count={mockPublicUsers.length}
+          isActive={filterStatus === 'all'}
           onClick={() => setFilterStatus('all')}
-          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-            filterStatus === 'all'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Tất cả ({mockPublicUsers.length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Hoạt động"
+          count={mockPublicUsers.filter(u => u.status === 'active').length}
+          isActive={filterStatus === 'active'}
           onClick={() => setFilterStatus('active')}
-          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-            filterStatus === 'active'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Hoạt động ({mockPublicUsers.filter(u => u.status === 'active').length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Khoá"
+          count={mockPublicUsers.filter(u => u.status === 'suspended').length}
+          isActive={filterStatus === 'suspended'}
           onClick={() => setFilterStatus('suspended')}
-          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-            filterStatus === 'suspended'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Khoá ({mockPublicUsers.filter(u => u.status === 'suspended').length})
-        </button>
+        />
       </div>
       <div className="rounded-lg border border-border bg-card p-6">
         <DataTable<PublicUser>

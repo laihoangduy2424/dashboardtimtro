@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockRooms, Room } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FilterButton } from '@/components/filter-button'
 import { Check, X } from 'lucide-react'
 
 export default function RoomsPage() {
@@ -126,56 +127,36 @@ export default function RoomsPage() {
 
       {/* Filter Buttons */}
       <div className="flex flex-wrap gap-2">
-        <button
+        <FilterButton
+          label="Tất cả tin"
+          count={mockRooms.length}
+          isActive={filterType === 'all'}
           onClick={() => setFilterType('all')}
-          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-            filterType === 'all'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Tất cả tin ({mockRooms.length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Phòng trọ"
+          count={mockRooms.filter(r => r.listingType === 'room_rental').length}
+          isActive={filterType === 'room_rental'}
           onClick={() => setFilterType('room_rental')}
-          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-            filterType === 'room_rental'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Phòng trọ ({mockRooms.filter(r => r.listingType === 'room_rental').length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Ở ghép"
+          count={mockRooms.filter(r => r.listingType === 'shared_room').length}
+          isActive={filterType === 'shared_room'}
           onClick={() => setFilterType('shared_room')}
-          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-            filterType === 'shared_room'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Ở ghép ({mockRooms.filter(r => r.listingType === 'shared_room').length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Đang hiển thị"
+          count={mockRooms.filter(r => r.publicStatus === 'displaying').length}
+          isActive={filterType === 'displaying'}
           onClick={() => setFilterType('displaying')}
-          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-            filterType === 'displaying'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Đang hiển thị ({mockRooms.filter(r => r.publicStatus === 'displaying').length})
-        </button>
-        <button
+        />
+        <FilterButton
+          label="Đã ẩn"
+          count={mockRooms.filter(r => r.publicStatus === 'hidden' || r.publicStatus === 'pending_review').length}
+          isActive={filterType === 'hidden'}
           onClick={() => setFilterType('hidden')}
-          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-            filterType === 'hidden'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Đã ẩn ({mockRooms.filter(r => r.publicStatus === 'hidden' || r.publicStatus === 'pending_review').length})
-        </button>
+        />
       </div>
 
       {/* Data Table */}

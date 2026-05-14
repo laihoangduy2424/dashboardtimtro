@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockLandlords, Landlord } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FilterButton } from '@/components/filter-button'
 import { Lock, Unlock } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
@@ -115,95 +116,61 @@ export default function LandlordsPage() {
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground"></h1>
-        <p className="mt-1 text-muted-foreground"></p>
+        <h1 className="text-3xl font-bold text-foreground">Quản lý chủ nhà</h1>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
-          <button
+          <FilterButton
+            label="Tất cả"
+            count={mockLandlords.length}
+            isActive={filterStatus === 'all'}
             onClick={() => setFilterStatus('all')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterStatus === 'all'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Tất cả ({mockLandlords.length})
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Hoạt động"
+            count={mockLandlords.filter(l => l.status === 'active').length}
+            isActive={filterStatus === 'active'}
             onClick={() => setFilterStatus('active')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterStatus === 'active'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Hoạt động ({mockLandlords.filter(l => l.status === 'active').length})
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Khoá"
+            count={mockLandlords.filter(l => l.status === 'suspended').length}
+            isActive={filterStatus === 'suspended'}
             onClick={() => setFilterStatus('suspended')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterStatus === 'suspended'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Khoá ({mockLandlords.filter(l => l.status === 'suspended').length})
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Hết hạn"
+            count={mockLandlords.filter(l => l.status === 'expired').length}
+            isActive={filterStatus === 'expired'}
             onClick={() => setFilterStatus('expired')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterStatus === 'expired'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Hết hạn ({mockLandlords.filter(l => l.status === 'expired').length})
-          </button>
+          />
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
+          <FilterButton
+            label="Tất cả gói"
+            isActive={filterTier === 'all'}
             onClick={() => setFilterTier('all')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterTier === 'all'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Tất cả gói
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Basic"
+            count={mockLandlords.filter(l => l.serviceTier === 'basic').length}
+            isActive={filterTier === 'basic'}
             onClick={() => setFilterTier('basic')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterTier === 'basic'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Basic ({mockLandlords.filter(l => l.serviceTier === 'basic').length})
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Pro"
+            count={mockLandlords.filter(l => l.serviceTier === 'pro').length}
+            isActive={filterTier === 'pro'}
             onClick={() => setFilterTier('pro')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterTier === 'pro'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Pro ({mockLandlords.filter(l => l.serviceTier === 'pro').length})
-          </button>
-          <button
+          />
+          <FilterButton
+            label="Enterprise"
+            count={mockLandlords.filter(l => l.serviceTier === 'enterprise').length}
+            isActive={filterTier === 'enterprise'}
             onClick={() => setFilterTier('enterprise')}
-            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-              filterTier === 'enterprise'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border bg-card hover:border-primary/50'
-            }`}
-          >
-            Enterprise ({mockLandlords.filter(l => l.serviceTier === 'enterprise').length})
-          </button>
+          />
         </div>
       </div>
       <div className="rounded-lg border border-border bg-card p-6">

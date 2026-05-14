@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockConversations, Conversation } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, MessageCircle } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 
 type ConversationType = 'all' | 'landlord_resident' | 'user_chatbot' | 'guest_listing_owner'
 type ConversationStatus = 'all' | 'active' | 'pending_response' | 'handled' | 'locked' | 'violation'
