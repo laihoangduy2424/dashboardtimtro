@@ -136,57 +136,47 @@ export default function MessagesPage() {
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Danh sách hội thoại</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Tổng cộng {mockConversations.length} hội thoại</p>
+        <h1 className="text-3xl font-bold text-foreground">Quản lý tin nhắn</h1>
       </div>
 
       {/* Filters */}
-      <div className="space-y-4 rounded-lg border border-border bg-card p-4">
-        {/* Search and Main Filters */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-3">
-          {/* Search Input */}
-          <div className="flex-1">
-            <label className="text-sm font-medium text-foreground">Tìm kiếm</label>
-            <input
-              type="text"
-              placeholder="Tìm theo nội dung, người dùng, mã hội thoại..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Search Input */}
+        <div className="flex-1 max-w-md">
+          <input
+            type="text"
+            placeholder="Tìm theo nội dung, người dùng, mã hội thoại..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
 
-          {/* Type Filter */}
-          <div className="min-w-max">
-            <label className="text-sm font-medium text-foreground">Loại hội thoại</label>
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as ConversationType)}
-              className="mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="all">Tất cả</option>
-              <option value="landlord_resident">Chủ nhà ↔ Cư dân</option>
-              <option value="user_chatbot">Người dùng ↔ Chatbot</option>
-              <option value="guest_listing_owner">Khách ↔ Người đăng tin</option>
-            </select>
-          </div>
+        {/* Filter Dropdowns */}
+        <div className="flex flex-wrap gap-3">
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as ConversationType)}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <option value="all">Tất cả loại</option>
+            <option value="landlord_resident">Chủ nhà ↔ Cư dân</option>
+            <option value="user_chatbot">Người dùng ↔ Chatbot</option>
+            <option value="guest_listing_owner">Khách ↔ Người đăng tin</option>
+          </select>
 
-          {/* Status Filter */}
-          <div className="min-w-max">
-            <label className="text-sm font-medium text-foreground">Trạng thái</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as ConversationStatus)}
-              className="mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="all">Tất cả</option>
-              <option value="active">Đang hoạt động</option>
-              <option value="pending_response">Chờ phản hồi</option>
-              <option value="handled">Đã xử lý</option>
-              <option value="locked">Đã khóa</option>
-              <option value="violation">Vi phạm</option>
-            </select>
-          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as ConversationStatus)}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <option value="all">Tất cả trạng thái</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="pending_response">Chờ phản hồi</option>
+            <option value="handled">Đã xử lý</option>
+            <option value="locked">Đã khóa</option>
+            <option value="violation">Vi phạm</option>
+          </select>
         </div>
       </div>
 
