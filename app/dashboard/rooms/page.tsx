@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockRooms, Room } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Check, X, Eye, EyeOff, Edit, Trash2 } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function RoomsPage() {
@@ -14,10 +14,7 @@ export default function RoomsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending_review' | 'displaying' | 'hidden' | 'rented'>('all')
 
-  // Calculate page visit statistics
-  const totalPageVisits = mockRooms.reduce((sum, room) => sum + (room.views || 0), 0)
-  const avgPageVisits = mockRooms.length > 0 ? Math.round(totalPageVisits / mockRooms.length) : 0
-  const maxPageVisits = Math.max(...mockRooms.map(r => r.views || 0), 0)
+
 
   const columns: Column<Room>[] = [
     {
@@ -92,110 +89,13 @@ export default function RoomsPage() {
     setIsModalOpen(true)
   }
 
-  const handleApprove = (room: Room) => {
-    console.log('Approving public listing:', room.id)
-    // TODO: Call API to approve room listing for public website
-  }
 
-  const handleReject = (room: Room) => {
-    console.log('Rejecting public listing:', room.id)
-    // TODO: Call API to reject room listing
-  }
-
-  const handleHideFromPublic = (room: Room) => {
-    console.log('Hiding room from public:', room.id)
-    // TODO: Call API to hide listing from public website
-  }
-
-  const handleEdit = (room: Room) => {
-    console.log('Editing posting:', room.id)
-    // TODO: Open edit modal/page
-  }
-
-  const handleDelete = (room: Room) => {
-    console.log('Deleting posting:', room.id)
-    // TODO: Call API to delete posting
-  }
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Quản lý tin đăng</h1>
-        <p className="mt-1 text-muted-foreground">Quản lý tất cả tin đăng - duyệt bài mới và theo dõi tương tác</p>
-      </div>
-
-      {/* Page Visit Statistics */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-sm font-medium text-muted-foreground">Tổng lượt xem</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{totalPageVisits.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground mt-2">Trên tất cả tin đăng</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-sm font-medium text-muted-foreground">Trung bình lượt/ tin</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{avgPageVisits}</p>
-          <p className="text-xs text-muted-foreground mt-2">Mỗi tin đăng</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-sm font-medium text-muted-foreground">Lượt xem cao nhất</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{maxPageVisits.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground mt-2">Tin đăng có lượt xem cao nhất</p>
-        </div>
-      </div>
-
-      {/* Status Statistics */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <button
-          onClick={() => setFilterStatus('all')}
-          className={`rounded-lg border p-4 text-left transition-colors ${
-            filterStatus === 'all'
-              ? 'border-primary bg-primary/10'
-              : 'border-border hover:border-primary/50'
-          }`}
-        >
-          <p className="text-sm font-medium text-muted-foreground">Tất cả tin đăng</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{mockRooms.length}</p>
-        </button>
-        <button
-          onClick={() => setFilterStatus('pending_review')}
-          className={`rounded-lg border p-4 text-left transition-colors ${
-            filterStatus === 'pending_review'
-              ? 'border-primary bg-primary/10'
-              : 'border-border hover:border-primary/50'
-          }`}
-        >
-          <p className="text-sm font-medium text-muted-foreground">Chờ duyệt</p>
-          <p className="text-2xl font-bold text-foreground mt-1">
-            {mockRooms.filter(r => r.publicStatus === 'pending_review').length}
-          </p>
-        </button>
-        <button
-          onClick={() => setFilterStatus('displaying')}
-          className={`rounded-lg border p-4 text-left transition-colors ${
-            filterStatus === 'displaying'
-              ? 'border-primary bg-primary/10'
-              : 'border-border hover:border-primary/50'
-          }`}
-        >
-          <p className="text-sm font-medium text-muted-foreground">Đang hiển thị</p>
-          <p className="text-2xl font-bold text-foreground mt-1">
-            {mockRooms.filter(r => r.publicStatus === 'displaying').length}
-          </p>
-        </button>
-        <button
-          onClick={() => setFilterStatus('hidden')}
-          className={`rounded-lg border p-4 text-left transition-colors ${
-            filterStatus === 'hidden'
-              ? 'border-primary bg-primary/10'
-              : 'border-border hover:border-primary/50'
-          }`}
-        >
-          <p className="text-sm font-medium text-muted-foreground">Đã ẩn</p>
-          <p className="text-2xl font-bold text-foreground mt-1">
-            {mockRooms.filter(r => r.publicStatus === 'hidden').length}
-          </p>
-        </button>
       </div>
 
       {/* Data Table */}
@@ -216,57 +116,6 @@ export default function RoomsPage() {
                 title="Xem chi tiết"
               >
                 <Eye size={16} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEdit(room)}
-                className="text-muted-foreground hover:text-foreground"
-                title="Chỉnh sửa tin"
-              >
-                <Edit size={16} />
-              </Button>
-              {room.publicStatus === 'pending_review' && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleApprove(room)}
-                    className="text-green-600 hover:text-green-700"
-                    title="Duyệt tin"
-                  >
-                    <Check size={16} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleReject(room)}
-                    className="text-red-600 hover:text-red-700"
-                    title="Từ chối"
-                  >
-                    <X size={16} />
-                  </Button>
-                </>
-              )}
-              {room.publicStatus === 'displaying' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleHideFromPublic(room)}
-                  className="text-orange-600 hover:text-orange-700"
-                  title="Ẩn khỏi công khai"
-                >
-                  <EyeOff size={16} />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(room)}
-                className="text-red-600 hover:text-red-700"
-                title="Xóa tin"
-              >
-                <Trash2 size={16} />
               </Button>
             </div>
           )}
