@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X, MessageSquare, Mail, LucideIcon } from 'lucide-react'
+import { Menu, X, MessageSquare, Mail, LucideIcon, ChevronDown, LayoutDashboard, Users, Home, FileText, Bot, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -9,17 +9,17 @@ import { cn } from '@/lib/utils'
 interface NavItem {
   name: string
   href: string
-  icon?: LucideIcon
+  icon: LucideIcon
 }
 
 const primaryNav: NavItem[] = [
-  { name: 'Bảng điều khiển', href: '/dashboard' },
-  { name: 'Chủ nhà', href: '/dashboard/landlords' },
-  { name: 'Tin đăng', href: '/dashboard/rooms' },
-  { name: 'Người dùng', href: '/dashboard/users' },
+  { name: 'Bảng điều khiển', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Chủ nhà', href: '/dashboard/landlords', icon: Users },
+  { name: 'Tin đăng', href: '/dashboard/rooms', icon: Home },
+  { name: 'Người dùng', href: '/dashboard/users', icon: Users },
   { name: 'Tin nhắn', href: '/dashboard/messages', icon: Mail },
-  { name: 'Chatbot', href: '/dashboard/chatbot', icon: MessageSquare },
-  { name: 'Báo cáo', href: '/dashboard/reports' },
+  { name: 'Chatbot', href: '/dashboard/chatbot', icon: Bot },
+  { name: 'Báo cáo', href: '/dashboard/reports', icon: BarChart3 },
 ]
 
 function NavLink({ 
@@ -39,14 +39,14 @@ function NavLink({
       href={item.href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+        'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
         isActive
-          ? 'bg-primary text-primary-foreground'
-          : 'text-foreground hover:bg-muted',
+          ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]'
+          : 'text-foreground hover:bg-muted hover:scale-[1.02]',
         className
       )}
     >
-      {Icon && <Icon size={16} />}
+      <Icon size={18} />
       {item.name}
     </Link>
   )
@@ -64,6 +64,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
+
+  // Get current page name for display
+  const currentPage = primaryNav.find(item => isNavActive(pathname, item.href))
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,16 +89,28 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {primaryNav.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={isNavActive(pathname, item.href)}
-              />
-            ))}
-          </nav>
+          {/* Desktop navigation - Hover dropdown */}
+          <div className="hidden md:block relative group">
+            {/* Trigger Button */}
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-medium transition-all duration-200 group-hover:bg-primary group-hover:text-primary-foreground">
+              {currentPage && <currentPage.icon size={18} />}
+              <span>{currentPage?.name || 'Menu'}</span>
+              <ChevronDown size={16} className="transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+
+            {/* Dropdown Menu */}
+            <div className="absolute right-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+              <nav className="bg-card border border-border rounded-2xl shadow-lg p-2 space-y-1">
+                {primaryNav.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    item={item}
+                    isActive={isNavActive(pathname, item.href)}
+                  />
+                ))}
+              </nav>
+            </div>
+          </div>
         </div>
 
         {/* Mobile menu */}
