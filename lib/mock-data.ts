@@ -82,10 +82,24 @@ export interface Report {
   adminNotes?: string
 }
 
-export interface ChatbotDataSource {
+export interface ChatbotConfig {
   id: string
   name: string
-  type: 'listing_info' | 'faq' | 'rules' | 'custom'
+  platform: 'public_listing' | 'resident_app'
+  status: 'active' | 'paused' | 'maintenance'
+  description: string
+  defaultGreeting: string
+  createdDate: string
+  updatedDate: string
+}
+
+export interface ChatbotDataSource {
+  id: string
+  configId: string
+  name: string
+  type: 'listing_info' | 'faq' | 'rules' | 'resident_info' | 'system_notification' | 'custom'
+  enabled: boolean
+  priority: number
   content: string
   createdDate: string
   updatedDate: string
@@ -93,17 +107,31 @@ export interface ChatbotDataSource {
 
 export interface ChatbotResponsePattern {
   id: string
+  configId: string
   trigger: string
   response: string
   priority: number
+  enabled: boolean
 }
 
 export interface ChatbotInteraction {
   id: string
+  configId: string
+  userId: string
   userMessage: string
   botResponse: string
+  platform: 'public_listing' | 'resident_app'
   timestamp: string
+  status: 'resolved' | 'pending' | 'escalated'
   userSatisfied?: boolean
+}
+
+export interface ChatbotResponseStyle {
+  configId: string
+  style: 'friendly' | 'professional' | 'concise'
+  responseLength: 'short' | 'medium' | 'long'
+  detailLevel: 'basic' | 'detailed' | 'comprehensive'
+  language: 'vi' | 'en'
 }
 
 // ==================== MOCK DATA ====================
@@ -566,31 +594,86 @@ export const mockChartData = {
   ],
 }
 
+// Mock Chatbot Configurations
+export const mockChatbotConfigs: ChatbotConfig[] = [
+  {
+    id: 'CB001',
+    name: 'Trợ lý Tin Đăng',
+    platform: 'public_listing',
+    status: 'active',
+    description: 'Hỗ trợ khách xem tin, giải đáp thông tin phòng trọ, hướng dẫn liên hệ',
+    defaultGreeting: 'Xin chào! Tôi là trợ lý ảo. Hỏi tôi về các phòng trọ hoặc bất kỳ thông tin nào bạn cần.',
+    createdDate: '2024-01-10',
+    updatedDate: '2024-02-16',
+  },
+  {
+    id: 'CB002',
+    name: 'Trợ lý App Cư Dân',
+    platform: 'resident_app',
+    status: 'active',
+    description: 'Hỗ trợ cư dân tra cứu thông tin, giúp sử dụng ứng dụng, giải đáp câu hỏi nội bộ',
+    defaultGreeting: 'Chào bạn! Tôi ở đây để giúp bạn với mọi câu hỏi về ứng dụng và thông tin cư dân.',
+    createdDate: '2024-01-15',
+    updatedDate: '2024-02-10',
+  },
+]
+
 // Mock Chatbot Data Sources
 export const mockChatbotDataSources: ChatbotDataSource[] = [
   {
     id: 'DS001',
-    name: 'Listing Information',
+    configId: 'CB001',
+    name: 'Thông tin bài đăng',
     type: 'listing_info',
+    enabled: true,
+    priority: 1,
     content: 'Room details, amenities, location, and rental terms',
     createdDate: '2024-01-10',
     updatedDate: '2024-02-15',
   },
   {
     id: 'DS002',
-    name: 'Frequently Asked Questions',
+    configId: 'CB001',
+    name: 'Câu hỏi thường gặp',
     type: 'faq',
+    enabled: true,
+    priority: 2,
     content: 'Common questions about booking, payment, and policies',
     createdDate: '2024-01-15',
     updatedDate: '2024-02-16',
   },
   {
     id: 'DS003',
-    name: 'House Rules',
+    configId: 'CB001',
+    name: 'Chính sách thuê phòng',
     type: 'rules',
+    enabled: true,
+    priority: 3,
     content: 'Tenant responsibilities, quiet hours, and restrictions',
     createdDate: '2024-01-20',
     updatedDate: '2024-02-14',
+  },
+  {
+    id: 'DS004',
+    configId: 'CB002',
+    name: 'Thông tin cư dân',
+    type: 'resident_info',
+    enabled: true,
+    priority: 1,
+    content: 'Resident profiles, contact information, account details',
+    createdDate: '2024-01-12',
+    updatedDate: '2024-02-15',
+  },
+  {
+    id: 'DS005',
+    configId: 'CB002',
+    name: 'Nội quy',
+    type: 'rules',
+    enabled: true,
+    priority: 2,
+    content: 'Building rules, common area usage, quiet hours',
+    createdDate: '2024-01-18',
+    updatedDate: '2024-02-13',
   },
 ]
 
@@ -598,21 +681,35 @@ export const mockChatbotDataSources: ChatbotDataSource[] = [
 export const mockChatbotPatterns: ChatbotResponsePattern[] = [
   {
     id: 'RP001',
+    configId: 'CB001',
     trigger: 'price|cost|how much|bao nhiêu',
     response: 'The rental price for this room is 3,000,000 VND per month, including utilities.',
     priority: 1,
+    enabled: true,
   },
   {
     id: 'RP002',
+    configId: 'CB001',
     trigger: 'location|where|address|địa chỉ',
     response: 'This room is located in District 1, Ho Chi Minh City, with easy access to public transportation.',
     priority: 1,
+    enabled: true,
   },
   {
     id: 'RP003',
+    configId: 'CB001',
     trigger: 'amenities|facilities|wifi|air conditioning',
     response: 'The room includes WiFi, air conditioning, and modern furniture. Common areas have a shared kitchen.',
     priority: 1,
+    enabled: true,
+  },
+  {
+    id: 'RP004',
+    configId: 'CB002',
+    trigger: 'how to|hướng dẫn|cách sử dụng',
+    response: 'You can find detailed tutorials in the Help section of the app. Would you like specific help with something?',
+    priority: 1,
+    enabled: true,
   },
 ]
 
@@ -620,37 +717,56 @@ export const mockChatbotPatterns: ChatbotResponsePattern[] = [
 export const mockChatbotInteractions: ChatbotInteraction[] = [
   {
     id: 'CI001',
+    configId: 'CB001',
+    userId: 'USER001',
     userMessage: 'What is the price of this room?',
     botResponse: 'The rental price for this room is 3,000,000 VND per month, including utilities.',
+    platform: 'public_listing',
     timestamp: '2024-02-16T10:30:00',
+    status: 'resolved',
     userSatisfied: true,
   },
   {
     id: 'CI002',
+    configId: 'CB001',
+    userId: 'USER002',
     userMessage: 'Where is this room located?',
     botResponse: 'This room is located in District 1, Ho Chi Minh City, with easy access to public transportation.',
+    platform: 'public_listing',
     timestamp: '2024-02-16T10:35:00',
+    status: 'resolved',
     userSatisfied: true,
   },
   {
     id: 'CI003',
-    userMessage: 'Do you have WiFi?',
-    botResponse: 'The room includes WiFi, air conditioning, and modern furniture. Common areas have a shared kitchen.',
+    configId: 'CB001',
+    userId: 'USER001',
+    userMessage: 'Can I visit the room this weekend?',
+    botResponse: 'Please contact the landlord directly to schedule a viewing. You can find their contact information in the listing details.',
+    platform: 'public_listing',
     timestamp: '2024-02-16T10:40:00',
-    userSatisfied: true,
+    status: 'pending',
   },
   {
     id: 'CI004',
-    userMessage: 'Can I bring guests?',
-    botResponse: 'I don\'t have specific information about guest policies. Please contact the landlord directly.',
+    configId: 'CB002',
+    userId: 'USER003',
+    userMessage: 'How do I update my profile?',
+    botResponse: 'Go to Settings > Profile to update your information. Click Edit to make changes and Save when done.',
+    platform: 'resident_app',
     timestamp: '2024-02-16T11:00:00',
-    userSatisfied: false,
+    status: 'resolved',
+    userSatisfied: true,
   },
   {
     id: 'CI005',
-    userMessage: 'What are the payment options?',
-    botResponse: 'Payment options and terms can be discussed directly with the landlord. Common questions about payment can be found in the FAQ section.',
+    configId: 'CB002',
+    userId: 'USER004',
+    userMessage: 'What are the building rules?',
+    botResponse: 'I don\'t have that information available. Please contact the management office for detailed building rules.',
+    platform: 'resident_app',
     timestamp: '2024-02-16T11:15:00',
-    userSatisfied: true,
+    status: 'escalated',
+    userSatisfied: false,
   },
 ]
