@@ -27,13 +27,13 @@ export interface Room {
   address: string
   building: string
   area: number
-  price: number
   bedrooms: number
   bathrooms: number
   landlordId: string
   landlordName: string
+  listingType: 'room_rental' | 'shared_room'
   // Status on public website
-  publicStatus: 'displaying' | 'hidden' | 'pending_review' | 'rented'
+  publicStatus: 'displaying' | 'hidden' | 'pending_review'
   reviewStatus?: 'pending' | 'approved' | 'rejected'
   image?: string
   createdDate: string
@@ -169,12 +169,12 @@ export const mockRooms: Room[] = [
     title: 'Phòng đơn Studio',
     address: '123 Nguyễn Hue, Quận 1, HCMC',
     building: 'Tòa nhà A',
-    price: 3000000,
     area: 25,
     bedrooms: 1,
     bathrooms: 1,
     landlordId: 'LL001',
     landlordName: 'Nguyễn Văn A',
+    listingType: 'room_rental',
     publicStatus: 'displaying',
     reviewStatus: 'approved',
     createdDate: '2024-01-20',
@@ -186,13 +186,13 @@ export const mockRooms: Room[] = [
     title: 'Căn hộ 2 phòng ngủ',
     address: '456 Lê Lợi, Quận 2, HCMC',
     building: 'Chung cư B',
-    price: 5500000,
     area: 45,
     bedrooms: 2,
     bathrooms: 1,
     landlordId: 'LL001',
     landlordName: 'Nguyễn Văn A',
-    publicStatus: 'rented',
+    listingType: 'room_rental',
+    publicStatus: 'hidden',
     reviewStatus: 'approved',
     createdDate: '2023-11-15',
     listingDate: '2023-11-18',
@@ -203,12 +203,12 @@ export const mockRooms: Room[] = [
     title: 'Phòng tiêu chuẩn',
     address: '789 Phạm Ngũ Lão, Quận 1, HCMC',
     building: 'Tòa nhà C',
-    price: 2800000,
     area: 20,
     bedrooms: 1,
     bathrooms: 1,
     landlordId: 'LL002',
     landlordName: 'Trần Thị B',
+    listingType: 'shared_room',
     publicStatus: 'displaying',
     reviewStatus: 'approved',
     createdDate: '2024-02-01',
@@ -220,12 +220,12 @@ export const mockRooms: Room[] = [
     title: 'Penthouse View',
     address: '321 Nguyễn Huệ Boulevard, Quận 1, HCMC',
     building: 'Tòa nhà D',
-    price: 8000000,
     area: 60,
     bedrooms: 3,
     bathrooms: 2,
     landlordId: 'LL002',
     landlordName: 'Trần Thị B',
+    listingType: 'room_rental',
     publicStatus: 'hidden',
     reviewStatus: 'approved',
     createdDate: '2023-12-10',
@@ -237,12 +237,12 @@ export const mockRooms: Room[] = [
     title: 'Studio nhỏ gọn',
     address: '555 Cách Mạng Tháng Tám, Quận 10, HCMC',
     building: 'Tòa nhà E',
-    price: 2500000,
     area: 18,
     bedrooms: 1,
     bathrooms: 1,
     landlordId: 'LL004',
     landlordName: 'Hoàng Thị D',
+    listingType: 'shared_room',
     publicStatus: 'pending_review',
     reviewStatus: 'pending',
     createdDate: '2024-02-15',
@@ -254,12 +254,12 @@ export const mockRooms: Room[] = [
     title: 'Phòng có ban công',
     address: '222 Nguyễn Trãi, Quận 5, HCMC',
     building: 'Tòa nhà F',
-    price: 3200000,
     area: 28,
     bedrooms: 1,
     bathrooms: 1,
     landlordId: 'LL004',
     landlordName: 'Hoàng Thị D',
+    listingType: 'room_rental',
     publicStatus: 'pending_review',
     reviewStatus: 'pending',
     createdDate: '2024-02-16',

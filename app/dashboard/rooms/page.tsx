@@ -6,15 +6,12 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockRooms, Room } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
+import { Eye, Check, X } from 'lucide-react'
 
 export default function RoomsPage() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending_review' | 'displaying' | 'hidden' | 'rented'>('all')
-
-
+  const [filterType, setFilterType] = useState<'all' | 'room_rental' | 'shared_room' | 'displaying' | 'hidden'>('all')
 
   const columns: Column<Room>[] = [
     {
@@ -35,31 +32,29 @@ export default function RoomsPage() {
       sortable: true,
     },
     {
+      header: 'Loại tin đăng',
+      accessor: 'listingType',
+      render: (value) => (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {value === 'room_rental' ? 'Phòng trọ' : 'Ở ghép'}
+        </span>
+      ),
+      sortable: true,
+    },
+    {
       header: 'Chủ nhà',
       accessor: 'landlordName',
-      sortable: true,
-    },
-    {
-      header: 'Giá',
-      accessor: 'price',
-      render: (value) => formatCurrency(value),
-      sortable: true,
-    },
-    {
-      header: 'Trạng thái nội bộ',
-      accessor: 'internalStatus',
-      render: (value) => {
-        const statusVariant = value === 'available' ? 'success' : value === 'rented' ? 'info' : 'warning'
-        return <StatusBadge status={value} variant={statusVariant} />
-      },
       sortable: true,
     },
     {
       header: 'Trạng thái công khai',
       accessor: 'publicStatus',
       render: (value) => {
-        const statusVariant = value === 'displaying' ? 'success' : value === 'pending_review' ? 'warning' : value === 'rented' ? 'info' : 'default'
-        return <StatusBadge status={value} variant={statusVariant} />
+        let variant: 'success' | 'warning' | 'default' | 'error' | 'info' = 'default'
+        if (value === 'displaying') variant = 'success'
+        if (value === 'hidden') variant = 'warning'
+        if (value === 'pending_review') variant = 'warning'
+        return <StatusBadge status={value} variant={variant} />
       },
       sortable: true,
     },
@@ -73,29 +68,114 @@ export default function RoomsPage() {
       sortable: true,
     },
     {
-      header: 'Lượt xem trang',
+      header: 'Lượt xem',
       accessor: 'views',
       render: (value) => value || 0,
       sortable: true,
     },
   ]
 
-  const filteredRooms = filterStatus === 'all' 
-    ? mockRooms 
-    : mockRooms.filter(r => r.publicStatus === filterStatus)
+  const getFilteredRooms = () => {
+    switch (filterType) {
+      case 'room_rental':
+        return mockRooms.filter(r => r.listingType === 'room_rental')
+      case 'shared_room':
+        return mockRooms.filter(r => r.listingType === 'shared_room')
+      case 'displaying':
+        return mockRooms.filter(r => r.publicStatus === 'displaying')
+      case 'hidden':
+        return mockRooms.filter(r => r.publicStatus === 'hidden' || r.publicStatus === 'pending_review')
+      default:
+        return mockRooms
+    }
+  }
+
+  const filteredRooms = getFilteredRooms()
 
   const handleViewDetails = (room: Room) => {
     setSelectedRoom(room)
     setIsModalOpen(true)
   }
 
+  const handleApprove = (room: Room) => {
+    console.log('Approving listing:', room.id)
+    // TODO: Call API to approve
+  }
 
+  const handleReject = (room: Room) => {
+    console.log('Rejecting listing:', room.id)
+    // TODO: Call API to reject
+  }
+
+  const handleHide = (room: Room) => {
+    console.log('Hiding listing:', room.id)
+    // TODO: Call API to hide
+  }
+
+  const handleShow = (room: Room) => {
+    console.log('Showing listing:', room.id)
+    // TODO: Call API to show
+  }
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Quản lý tin đăng</h1>
+      </div>
+
+      {/* Filter Buttons */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setFilterType('all')}
+          className={`px-4 py-2 rounded-lg border transition-colors ${
+            filterType === 'all'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Tất cả tin ({mockRooms.length})
+        </button>
+        <button
+          onClick={() => setFilterType('room_rental')}
+          className={`px-4 py-2 rounded-lg border transition-colors ${
+            filterType === 'room_rental'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Phòng trọ ({mockRooms.filter(r => r.listingType === 'room_rental').length})
+        </button>
+        <button
+          onClick={() => setFilterType('shared_room')}
+          className={`px-4 py-2 rounded-lg border transition-colors ${
+            filterType === 'shared_room'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Ở ghép ({mockRooms.filter(r => r.listingType === 'shared_room').length})
+        </button>
+        <button
+          onClick={() => setFilterType('displaying')}
+          className={`px-4 py-2 rounded-lg border transition-colors ${
+            filterType === 'displaying'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Đang hiển thị ({mockRooms.filter(r => r.publicStatus === 'displaying').length})
+        </button>
+        <button
+          onClick={() => setFilterType('hidden')}
+          className={`px-4 py-2 rounded-lg border transition-colors ${
+            filterType === 'hidden'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Đã ẩn ({mockRooms.filter(r => r.publicStatus === 'hidden' || r.publicStatus === 'pending_review').length})
+        </button>
       </div>
 
       {/* Data Table */}
@@ -127,7 +207,7 @@ export default function RoomsPage() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Chi tiết tin đăng</DialogTitle>
-            <DialogDescription>Xem và quản lý thông tin tin đăng và các chỉ số tương tác</DialogDescription>
+            <DialogDescription>Xem thông tin tin đăng và các chỉ số tương tác</DialogDescription>
           </DialogHeader>
 
           {selectedRoom && (
@@ -147,6 +227,12 @@ export default function RoomsPage() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Toà nhà/Tài sản</p>
                     <p className="text-foreground">{selectedRoom.building}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Loại tin đăng</p>
+                    <p className="text-foreground font-semibold">
+                      {selectedRoom.listingType === 'room_rental' ? 'Phòng trọ' : 'Ở ghép'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Chủ nhà</p>
@@ -171,14 +257,6 @@ export default function RoomsPage() {
                     <p className="text-sm font-medium text-muted-foreground">Diện tích</p>
                     <p className="mt-1 text-lg font-semibold text-foreground">{selectedRoom.area} m²</p>
                   </div>
-                  <div className="rounded-lg bg-muted p-3 sm:col-span-2">
-                    <p className="text-sm font-medium text-muted-foreground">Giá</p>
-                    <p className="mt-1 text-lg font-semibold text-foreground">{formatCurrency(selectedRoom.price)}</p>
-                  </div>
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium text-muted-foreground">Giá/m²</p>
-                    <p className="mt-1 text-lg font-semibold text-foreground">{formatCurrency(selectedRoom.price / selectedRoom.area)}</p>
-                  </div>
                 </div>
               </div>
 
@@ -187,21 +265,6 @@ export default function RoomsPage() {
                 <h3 className="mb-3 font-semibold text-foreground">Thông tin trạng thái</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Trạng thái nội bộ</p>
-                    <div className="mt-1">
-                      <StatusBadge
-                        status={selectedRoom.internalStatus}
-                        variant={
-                          selectedRoom.internalStatus === 'available'
-                            ? 'success'
-                            : selectedRoom.internalStatus === 'rented'
-                              ? 'info'
-                              : 'warning'
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
                     <p className="text-sm font-medium text-muted-foreground">Trạng thái công khai</p>
                     <div className="mt-1">
                       <StatusBadge
@@ -209,11 +272,7 @@ export default function RoomsPage() {
                         variant={
                           selectedRoom.publicStatus === 'displaying'
                             ? 'success'
-                            : selectedRoom.publicStatus === 'pending_review'
-                              ? 'warning'
-                              : selectedRoom.publicStatus === 'rented'
-                                ? 'info'
-                                : 'default'
+                            : 'warning'
                         }
                       />
                     </div>
@@ -235,7 +294,7 @@ export default function RoomsPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Ngày đăng</p>
-                    <p className="text-foreground">{new Date(selectedRoom.createdDate).toLocaleDateString()}</p>
+                    <p className="text-foreground">{new Date(selectedRoom.createdDate).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
               </div>
@@ -260,51 +319,44 @@ export default function RoomsPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={() => handleEdit(selectedRoom)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Edit size={16} className="mr-2" />
-                  Chỉnh sửa tin
-                </Button>
-                {selectedRoom.publicStatus === 'pending_review' && (
-                  <>
+              <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <p className="text-sm font-semibold text-foreground">Các tác vụ</p>
+                <div className="flex gap-2 flex-wrap">
+                  {selectedRoom.publicStatus === 'pending_review' && (
+                    <>
+                      <Button
+                        onClick={() => handleApprove(selectedRoom)}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Check size={16} className="mr-2" />
+                        Duyệt
+                      </Button>
+                      <Button
+                        onClick={() => handleReject(selectedRoom)}
+                        variant="destructive"
+                      >
+                        <X size={16} className="mr-2" />
+                        Không duyệt
+                      </Button>
+                    </>
+                  )}
+                  {selectedRoom.publicStatus === 'displaying' && (
                     <Button
-                      onClick={() => handleApprove(selectedRoom)}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      onClick={() => handleHide(selectedRoom)}
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
                     >
-                      <Check size={16} className="mr-2" />
-                      Duyệt
+                      Ẩn
                     </Button>
+                  )}
+                  {selectedRoom.publicStatus === 'hidden' && (
                     <Button
-                      onClick={() => handleReject(selectedRoom)}
-                      variant="destructive"
-                      className="flex-1"
+                      onClick={() => handleShow(selectedRoom)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      <X size={16} className="mr-2" />
-                      Từ chối
+                      Hiển thị
                     </Button>
-                  </>
-                )}
-                {selectedRoom.publicStatus === 'displaying' && (
-                  <Button
-                    onClick={() => handleHideFromPublic(selectedRoom)}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700"
-                  >
-                    <EyeOff size={16} className="mr-2" />
-                    Ẩn khỏi công khai
-                  </Button>
-                )}
-                <Button
-                  onClick={() => handleDelete(selectedRoom)}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Xóa
-                </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}
