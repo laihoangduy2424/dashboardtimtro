@@ -6,53 +6,42 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockPublicUsers, PublicUser } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Lock, Trash2 } from 'lucide-react'
+import { Eye, Lock } from 'lucide-react'
 
 export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'suspended'>('all')
 
-  const columns: Column<PublicUser>[] = [
-    {
-      header: 'ID',
-      accessor: 'id',
+  const handleViewDetails = (user: PublicUser) => {
+    setSelectedUser(user)
+    setIsModalOpen(true)
+  }
+
+  const handleSuspend = (user: PublicUser) => {
+    console.log('Suspending user:', user.id)
+    // TODO: Call API to suspend user
+  }
+
+  const handleActivate = (user: PublicUser) => {
+    console.log('Activating user:', user.id)
+    // TODO: Call API to activate user
+  }
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {labels[value]}
+          </span>
+        )
+      },
       sortable: true,
-      className: 'w-24',
     },
     {
-      header: 'Tên',
-      accessor: 'name',
-      sortable: true,
-    },
-    {
-      header: 'Email',
-      accessor: 'email',
-      sortable: true,
-    },
-    {
-      header: 'Điện thoại',
-      accessor: 'phone',
-    },
-    {
-      header: 'Tình trạng tài khoản',
+      header: 'Trạng thái',
       accessor: 'status',
       render: (value) => {
         const statusVariant = value === 'active' ? 'success' : 'error'
         return <StatusBadge status={value} variant={statusVariant} />
       },
-      sortable: true,
-    },
-    {
-      header: 'Lượt xem',
-      accessor: 'views',
-      render: (value) => value,
-      sortable: true,
-    },
-    {
-      header: 'Số liên hệ',
-      accessor: 'contactCount',
-      render: (value) => value,
       sortable: true,
     },
     {
@@ -146,26 +135,6 @@ export default function UsersPage() {
               >
                 <Eye size={16} />
               </Button>
-              {user.status === 'active' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSuspend(user)}
-                    className="text-orange-600 hover:text-orange-700"
-                    title="Khoá tài khoản"
-                  >
-                    <Lock size={16} />
-                  </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(user)}
-                className="text-red-600 hover:text-red-700"
-                title="Xóa tài khoản"
-              >
-                <Trash2 size={16} />
-              </Button>
             </div>
           )}
         />
@@ -173,17 +142,17 @@ export default function UsersPage() {
 
       {/* Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Chi tiết người dùng</DialogTitle>
-            <DialogDescription>Xem và quản lý tài khoản người dùng trang công khai</DialogDescription>
+            <DialogTitle>Chi tiết tài khoản người dùng</DialogTitle>
+            <DialogDescription>Xem thông tin tài khoản và quyền đăng bài</DialogDescription>
           </DialogHeader>
 
           {selectedUser && (
             <div className="space-y-6">
               {/* User Information */}
               <div>
-                <h3 className="mb-3 font-semibold text-foreground">Thông tin người dùng</h3>
+                <h3 className="mb-3 font-semibold text-foreground">Thông tin tài khoản</h3>
                 <div className="grid gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Tên</p>
@@ -196,6 +165,37 @@ export default function UsersPage() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Điện thoại</p>
                     <p className="text-foreground">{selectedUser.phone || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Type & Permissions */}
+              <div>
+                <h3 className="mb-3 font-semibold text-foreground">Loại tài khoản & Quyền</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Loại tài khoản</p>
+                    <p className="mt-1 font-semibold text-foreground">
+                      {selectedUser.accountType === 'landlord' ? 'Chủ nhà' : 'Cư dân'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Có thể đăng bài</p>
+                    <p className="mt-1 font-semibold text-foreground">
+                      {selectedUser.canPostListing ? 'Có' : 'Không'}
+                    </p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground">Quyền đăng bài</p>
+                    <div className="mt-1">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        {selectedUser.postingPermission === 'room_rental'
+                          ? 'Phòng trọ'
+                          : selectedUser.postingPermission === 'shared_room'
+                            ? 'Ở ghép'
+                            : 'Cả hai'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -215,49 +215,34 @@ export default function UsersPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Ngày tham gia</p>
-                    <p className="text-foreground">{new Date(selectedUser.joinedDate).toLocaleDateString()}</p>
+                    <p className="text-foreground">{new Date(selectedUser.joinedDate).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Hoạt động gần nhất</p>
-                    <p className="text-foreground">{new Date(selectedUser.lastActive).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Activity Statistics */}
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Thống kê hoạt động</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium text-muted-foreground">Lượt xem phòng</p>
-                    <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.views}</p>
-                  </div>
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium text-muted-foreground">Số liên hệ đã thực hiện</p>
-                    <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.contactCount}</p>
+                    <p className="text-foreground">{new Date(selectedUser.lastActive).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-4 border-t border-border">
                 {selectedUser.status === 'active' && (
                   <Button
                     onClick={() => handleSuspend(selectedUser)}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
                   >
                     <Lock size={16} className="mr-2" />
-                    Khoá tài khoản
+                    Khóa tài khoản
                   </Button>
                 )}
-                <Button
-                  onClick={() => handleDelete(selectedUser)}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Xóa tài khoản
-                </Button>
+                {selectedUser.status === 'suspended' && (
+                  <Button
+                    onClick={() => handleActivate(selectedUser)}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Mở khóa tài khoản
+                  </Button>
+                )}
               </div>
             </div>
           )}

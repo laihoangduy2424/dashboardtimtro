@@ -59,10 +59,11 @@ export interface PublicUser {
   name: string
   email?: string
   phone?: string
+  accountType: 'landlord' | 'resident'
+  canPostListing: boolean
+  postingPermission: 'room_rental' | 'shared_room' | 'both'
   status: 'active' | 'suspended'
   joinedDate: string
-  views: number
-  contactCount: number
   lastActive: string
 }
 
@@ -306,17 +307,18 @@ export const mockTenants: Tenant[] = [
   },
 ]
 
-// Mock Public Website Users (Searchers)
+// Mock Public Website Users (Both Landlords & Residents who can post listings)
 export const mockPublicUsers: PublicUser[] = [
   {
     id: 'PU001',
     name: 'Ngô Thị Hoa',
     email: 'hoa.ngo@example.com',
     phone: '0944444444',
+    accountType: 'landlord',
+    canPostListing: true,
+    postingPermission: 'room_rental',
     status: 'active',
     joinedDate: '2024-01-15',
-    views: 23,
-    contactCount: 5,
     lastActive: '2024-02-16',
   },
   {
@@ -324,10 +326,11 @@ export const mockPublicUsers: PublicUser[] = [
     name: 'Đặng Văn Minh',
     email: 'minh.dang@example.com',
     phone: '0955555555',
+    accountType: 'resident',
+    canPostListing: true,
+    postingPermission: 'shared_room',
     status: 'active',
     joinedDate: '2023-11-08',
-    views: 45,
-    contactCount: 12,
     lastActive: '2024-02-15',
   },
   {
@@ -335,11 +338,60 @@ export const mockPublicUsers: PublicUser[] = [
     name: 'Chu Thị Phương',
     email: 'phuong.chu@example.com',
     phone: '0966666666',
+    accountType: 'landlord',
+    canPostListing: true,
+    postingPermission: 'both',
     status: 'suspended',
     joinedDate: '2024-01-01',
-    views: 128,
-    contactCount: 42,
     lastActive: '2024-02-10',
+  },
+  {
+    id: 'PU004',
+    name: 'Lý Quốc Anh',
+    email: 'anh.ly@example.com',
+    phone: '0977777777',
+    accountType: 'resident',
+    canPostListing: true,
+    postingPermission: 'shared_room',
+    status: 'active',
+    joinedDate: '2024-02-01',
+    lastActive: '2024-02-16',
+  },
+  {
+    id: 'PU005',
+    name: 'Vũ Thị Nhân',
+    email: 'nhan.vu@example.com',
+    phone: '0988888888',
+    accountType: 'landlord',
+    canPostListing: true,
+    postingPermission: 'room_rental',
+    status: 'active',
+    joinedDate: '2023-12-20',
+    lastActive: '2024-02-14',
+  },
+  {
+    id: 'PU006',
+    name: 'Trần Minh Tuấn',
+    email: 'tuan.tran@example.com',
+    phone: '0999999999',
+    accountType: 'resident',
+    canPostListing: false,
+    postingPermission: 'shared_room',
+    status: 'active',
+    joinedDate: '2024-01-25',
+    lastActive: '2024-02-13',
+  },
+  {
+    id: 'PU007',
+    name: 'Hoàng Kim Dung',
+    email: 'dung.hoang@example.com',
+    phone: '0900000000',
+    accountType: 'landlord',
+    canPostListing: true,
+    postingPermission: 'both',
+    status: 'active',
+    joinedDate: '2023-10-15',
+    lastActive: '2024-02-16',
   },
 ]
 
