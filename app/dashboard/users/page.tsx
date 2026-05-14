@@ -11,6 +11,7 @@ import { Eye, Lock, Trash2 } from 'lucide-react'
 export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'suspended'>('all')
 
   const columns: Column<PublicUser>[] = [
     {
@@ -77,6 +78,15 @@ export default function UsersPage() {
     // TODO: Call API to delete user
   }
 
+  const getFilteredUsers = () => {
+    if (filterStatus === 'all') {
+      return mockPublicUsers
+    }
+    return mockPublicUsers.filter(u => u.status === filterStatus)
+  }
+
+  const filteredUsers = getFilteredUsers()
+
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -85,10 +95,42 @@ export default function UsersPage() {
         <p className="mt-1 text-muted-foreground">Quản lý người dùng tìm phòng trên trang công khai</p>
       </div>
 
-      {/* Data Table */}
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setFilterStatus('all')}
+          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+            filterStatus === 'all'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Tất cả ({mockPublicUsers.length})
+        </button>
+        <button
+          onClick={() => setFilterStatus('active')}
+          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+            filterStatus === 'active'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Hoạt động ({mockPublicUsers.filter(u => u.status === 'active').length})
+        </button>
+        <button
+          onClick={() => setFilterStatus('suspended')}
+          className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+            filterStatus === 'suspended'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border bg-card hover:border-primary/50'
+          }`}
+        >
+          Khoá ({mockPublicUsers.filter(u => u.status === 'suspended').length})
+        </button>
+      </div>
       <div className="rounded-lg border border-border bg-card p-6">
         <DataTable<PublicUser>
-          data={mockPublicUsers}
+          data={filteredUsers}
           columns={columns}
           searchPlaceholder="Tìm người dùng theo tên hoặc email..."
           searchableFields={['name', 'email', 'phone']}
