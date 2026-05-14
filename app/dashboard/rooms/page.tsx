@@ -6,14 +6,12 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockRooms, Room } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ChatbotWidget } from '@/components/chatbot-widget'
-import { Check, X, MessageCircle } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 
 export default function RoomsPage() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filterType, setFilterType] = useState<'all' | 'room_rental' | 'shared_room' | 'displaying' | 'hidden'>('all')
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false)
 
   const columns: Column<Room>[] = [
     {
@@ -122,25 +120,15 @@ export default function RoomsPage() {
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Quản lý tin đăng</h1>
-        </div>
-        <Button
-          onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-          variant={isChatbotOpen ? 'default' : 'outline'}
-          className="gap-2"
-        >
-          <MessageCircle size={18} />
-          {isChatbotOpen ? 'Đóng Chatbot' : 'Mở Chatbot'}
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Quản lý tin đăng</h1>
       </div>
 
       {/* Filter Buttons */}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setFilterType('all')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
+          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
             filterType === 'all'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'border-border bg-card hover:border-primary/50'
@@ -150,7 +138,7 @@ export default function RoomsPage() {
         </button>
         <button
           onClick={() => setFilterType('room_rental')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
+          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
             filterType === 'room_rental'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'border-border bg-card hover:border-primary/50'
@@ -160,7 +148,7 @@ export default function RoomsPage() {
         </button>
         <button
           onClick={() => setFilterType('shared_room')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
+          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
             filterType === 'shared_room'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'border-border bg-card hover:border-primary/50'
@@ -170,7 +158,7 @@ export default function RoomsPage() {
         </button>
         <button
           onClick={() => setFilterType('displaying')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
+          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
             filterType === 'displaying'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'border-border bg-card hover:border-primary/50'
@@ -180,63 +168,7 @@ export default function RoomsPage() {
         </button>
         <button
           onClick={() => setFilterType('hidden')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
-            filterType === 'hidden'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Đã ẩn ({mockRooms.filter(r => r.publicStatus === 'hidden' || r.publicStatus === 'pending_review').length})
-        </button>
-      </div>
-
-      {/* Main Content with Chatbot */}
-      <div className="flex gap-6">
-        {/* Table Section */}
-        <div className="flex-1">
-        <button
-          onClick={() => setFilterType('all')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
-            filterType === 'all'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Tất cả tin ({mockRooms.length})
-        </button>
-        <button
-          onClick={() => setFilterType('room_rental')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
-            filterType === 'room_rental'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Phòng trọ ({mockRooms.filter(r => r.listingType === 'room_rental').length})
-        </button>
-        <button
-          onClick={() => setFilterType('shared_room')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
-            filterType === 'shared_room'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Ở ghép ({mockRooms.filter(r => r.listingType === 'shared_room').length})
-        </button>
-        <button
-          onClick={() => setFilterType('displaying')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
-            filterType === 'displaying'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border bg-card hover:border-primary/50'
-          }`}
-        >
-          Đang hiển thị ({mockRooms.filter(r => r.publicStatus === 'displaying').length})
-        </button>
-        <button
-          onClick={() => setFilterType('hidden')}
-          className={`px-4 py-2 rounded-lg border transition-colors ${
+          className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
             filterType === 'hidden'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'border-border bg-card hover:border-primary/50'
@@ -257,17 +189,7 @@ export default function RoomsPage() {
         />
       </div>
 
-        {/* Chatbot Widget - Sidebar */}
-        {isChatbotOpen && (
-          <div className="w-full lg:w-md sticky top-4 h-fit">
-            <ChatbotWidget
-              title="Hỗ trợ Listing"
-              isOpen={isChatbotOpen}
-              onClose={() => setIsChatbotOpen(false)}
-            />
-          </div>
-        )}
-      </div>
+      {/* Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
