@@ -82,6 +82,30 @@ export interface Report {
   adminNotes?: string
 }
 
+export interface ChatbotDataSource {
+  id: string
+  name: string
+  type: 'listing_info' | 'faq' | 'rules' | 'custom'
+  content: string
+  createdDate: string
+  updatedDate: string
+}
+
+export interface ChatbotResponsePattern {
+  id: string
+  trigger: string
+  response: string
+  priority: number
+}
+
+export interface ChatbotInteraction {
+  id: string
+  userMessage: string
+  botResponse: string
+  timestamp: string
+  userSatisfied?: boolean
+}
+
 // ==================== MOCK DATA ====================
 
 // Mock Landlords (SaaS Customers)
@@ -541,3 +565,92 @@ export const mockChartData = {
     { day: 'Sun', views: 198 },
   ],
 }
+
+// Mock Chatbot Data Sources
+export const mockChatbotDataSources: ChatbotDataSource[] = [
+  {
+    id: 'DS001',
+    name: 'Listing Information',
+    type: 'listing_info',
+    content: 'Room details, amenities, location, and rental terms',
+    createdDate: '2024-01-10',
+    updatedDate: '2024-02-15',
+  },
+  {
+    id: 'DS002',
+    name: 'Frequently Asked Questions',
+    type: 'faq',
+    content: 'Common questions about booking, payment, and policies',
+    createdDate: '2024-01-15',
+    updatedDate: '2024-02-16',
+  },
+  {
+    id: 'DS003',
+    name: 'House Rules',
+    type: 'rules',
+    content: 'Tenant responsibilities, quiet hours, and restrictions',
+    createdDate: '2024-01-20',
+    updatedDate: '2024-02-14',
+  },
+]
+
+// Mock Chatbot Response Patterns
+export const mockChatbotPatterns: ChatbotResponsePattern[] = [
+  {
+    id: 'RP001',
+    trigger: 'price|cost|how much|bao nhiêu',
+    response: 'The rental price for this room is 3,000,000 VND per month, including utilities.',
+    priority: 1,
+  },
+  {
+    id: 'RP002',
+    trigger: 'location|where|address|địa chỉ',
+    response: 'This room is located in District 1, Ho Chi Minh City, with easy access to public transportation.',
+    priority: 1,
+  },
+  {
+    id: 'RP003',
+    trigger: 'amenities|facilities|wifi|air conditioning',
+    response: 'The room includes WiFi, air conditioning, and modern furniture. Common areas have a shared kitchen.',
+    priority: 1,
+  },
+]
+
+// Mock Chatbot Interactions
+export const mockChatbotInteractions: ChatbotInteraction[] = [
+  {
+    id: 'CI001',
+    userMessage: 'What is the price of this room?',
+    botResponse: 'The rental price for this room is 3,000,000 VND per month, including utilities.',
+    timestamp: '2024-02-16T10:30:00',
+    userSatisfied: true,
+  },
+  {
+    id: 'CI002',
+    userMessage: 'Where is this room located?',
+    botResponse: 'This room is located in District 1, Ho Chi Minh City, with easy access to public transportation.',
+    timestamp: '2024-02-16T10:35:00',
+    userSatisfied: true,
+  },
+  {
+    id: 'CI003',
+    userMessage: 'Do you have WiFi?',
+    botResponse: 'The room includes WiFi, air conditioning, and modern furniture. Common areas have a shared kitchen.',
+    timestamp: '2024-02-16T10:40:00',
+    userSatisfied: true,
+  },
+  {
+    id: 'CI004',
+    userMessage: 'Can I bring guests?',
+    botResponse: 'I don\'t have specific information about guest policies. Please contact the landlord directly.',
+    timestamp: '2024-02-16T11:00:00',
+    userSatisfied: false,
+  },
+  {
+    id: 'CI005',
+    userMessage: 'What are the payment options?',
+    botResponse: 'Payment options and terms can be discussed directly with the landlord. Common questions about payment can be found in the FAQ section.',
+    timestamp: '2024-02-16T11:15:00',
+    userSatisfied: true,
+  },
+]
