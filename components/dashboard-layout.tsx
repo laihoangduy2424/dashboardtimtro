@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -11,7 +11,10 @@ const navigation = [
   { name: 'Tin đăng', href: '/dashboard/rooms' },
   { name: 'Người dùng', href: '/dashboard/users' },
   { name: 'Báo cáo', href: '/dashboard/reports' },
-  // Public search page removed
+]
+
+const secondaryNav = [
+  { name: 'Quản lý Chatbot', href: '/dashboard/rooms/chatbot', icon: MessageSquare },
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -53,6 +56,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Divider */}
+            <div className="h-6 w-px bg-border mx-2"></div>
+            
+            {/* Secondary navigation */}
+            {secondaryNav.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href || pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <Icon size={16} />
+                  {item.name}
+                </Link>
+              )
+            })}
           </nav>
         </div>
 
@@ -73,6 +99,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Mobile secondary navigation */}
+            <div className="border-t border-border pt-2 mt-2 space-y-2">
+              {secondaryNav.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href || pathname.startsWith(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground hover:bg-muted'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Icon size={16} />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
           </nav>
         )}
       </header>
