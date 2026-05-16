@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navigation = [
-  { name: 'Tin đăng', href: '/dashboard/rooms', icon: FileText },
+  { name: 'Tin đăng', href: '/dashboard/listings', icon: FileText },
   { name: 'Người dùng', href: '/dashboard/users', icon: Users },
   { name: 'Tin nhắn', href: '/dashboard/messages', icon: MessageSquare },
   { name: 'Chat bot', href: '/dashboard/chatbot', icon: Bot },
