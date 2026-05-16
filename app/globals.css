@@ -44,44 +44,9 @@
   --sidebar-ring: oklch(0.5 0.18 262);
 }
 
-.dark {
-  --background: oklch(0.12 0.01 0);
-  --foreground: oklch(0.95 0.001 0);
-  --card: oklch(0.15 0.01 0);
-  --card-foreground: oklch(0.92 0.001 0);
-  --popover: oklch(0.15 0.01 0);
-  --popover-foreground: oklch(0.92 0.001 0);
-  --primary: oklch(0.6 0.18 262);
-  --primary-foreground: oklch(0.12 0.01 0);
-  --secondary: oklch(0.25 0.02 262);
-  --secondary-foreground: oklch(0.92 0.001 0);
-  --muted: oklch(0.28 0.01 0);
-  --muted-foreground: oklch(0.65 0.01 0);
-  --accent: oklch(0.6 0.18 262);
-  --accent-foreground: oklch(0.12 0.01 0);
-  --destructive: oklch(0.52 0.22 25);
-  --destructive-foreground: oklch(0.92 0.001 0);
-  --border: oklch(0.25 0.01 0);
-  --input: oklch(0.2 0.01 0);
-  --ring: oklch(0.6 0.18 262);
-  --chart-1: oklch(0.6 0.18 262);
-  --chart-2: oklch(0.72 0.15 305);
-  --chart-3: oklch(0.65 0.16 28);
-  --chart-4: oklch(0.75 0.12 85);
-  --chart-5: oklch(0.78 0.14 180);
-  --sidebar: oklch(0.12 0.01 0);
-  --sidebar-foreground: oklch(0.95 0.001 0);
-  --sidebar-primary: oklch(0.6 0.18 262);
-  --sidebar-primary-foreground: oklch(0.12 0.01 0);
-  --sidebar-accent: oklch(0.25 0.02 0);
-  --sidebar-accent-foreground: oklch(0.95 0.001 0);
-  --sidebar-border: oklch(0.2 0.01 0);
-  --sidebar-ring: oklch(0.6 0.18 262);
-}
-
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Roboto', sans-serif;
+  --font-mono: 'Roboto Mono', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -130,8 +95,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Roboto', sans-serif;
+  --font-mono: 'Roboto Mono', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

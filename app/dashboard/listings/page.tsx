@@ -223,7 +223,7 @@ export default function ListingsPage() {
                   />
                 )}
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-foreground" style={{ fontFamily: '"Roboto", sans-serif' }}>
+              <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
                 Ngày duyệt bài
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
