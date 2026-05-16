@@ -97,6 +97,17 @@ export interface SamplePrompt {
   tokenCount: number
 }
 
+// Messages/Conversations for dashboard messages page
+export interface DashboardConversation {
+  id: string
+  conversationType: 'landlord_to_tenant' | 'user_to_chatbot' | 'tenant_to_tenant'
+  sender: string
+  recipient: string
+  latestMessage: string
+  lastUpdated: string
+  status: 'active' | 'resolved' | 'pending_response'
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
@@ -616,7 +627,7 @@ export const mockConversations: Conversation[] = [
       {
         id: 'msg-2',
         role: 'assistant',
-        content: 'Dựa trên dữ liệu thị trường, giá thuê phòng của bạn đang ở mức trung bình với các tiện ích được cung cấp. Tôi khuyên bạn nên xem xét các yếu tố như vị trí, kích thước và các tiện ích được cung cấp.',
+        content: 'Dựa trên dữ liệu thị trường, giá thuê phòng của bạn đang ở m��c trung bình với các tiện ích được cung cấp. Tôi khuyên bạn nên xem xét các yếu tố như vị trí, kích thước và các tiện ích được cung cấp.',
         timestamp: '2024-02-14T10:31:00Z',
         tokens: 45,
       },
@@ -672,3 +683,53 @@ export const mockTokenInfo: TokenInfo = {
   percentageUsed: 0.0124,
   costPerMillion: 15,
 }
+
+// ==================== DASHBOARD MESSAGES MOCK DATA ====================
+
+export const mockDashboardConversations: DashboardConversation[] = [
+  {
+    id: 'CONV001',
+    conversationType: 'landlord_to_tenant',
+    sender: 'Nguyễn Văn A',
+    recipient: 'Trần Mình Khánh',
+    latestMessage: 'Ok, tôi sẽ kiểm tra và sửa chữa các hư hỏng...',
+    lastUpdated: '16/2/2024 14:30',
+    status: 'active',
+  },
+  {
+    id: 'CONV002',
+    conversationType: 'user_to_chatbot',
+    sender: 'Ngô Thị Hoa',
+    recipient: 'Chatbot',
+    latestMessage: 'Cảm ơn thông tin, tôi sẽ liên hệ chủ nhà ngay',
+    lastUpdated: '16/2/2024 13:15',
+    status: 'resolved',
+  },
+  {
+    id: 'CONV003',
+    conversationType: 'landlord_to_tenant',
+    sender: 'Trần Thị B',
+    recipient: 'Vương Thị Linh',
+    latestMessage: 'Chủ yêu cầu bạn thanh toán tiền điện trước...',
+    lastUpdated: '16/2/2024 12:45',
+    status: 'pending_response',
+  },
+  {
+    id: 'CONV004',
+    conversationType: 'tenant_to_tenant',
+    sender: 'Lê Minh Tuấn',
+    recipient: 'Phạm Tú Anh',
+    latestMessage: 'Bạn có biết ai sửa điều hòa ở khu vực này không?',
+    lastUpdated: '15/2/2024 16:20',
+    status: 'active',
+  },
+  {
+    id: 'CONV005',
+    conversationType: 'landlord_to_tenant',
+    sender: 'Hoàng Quốc Việt',
+    recipient: 'Bùi Thị Hương',
+    latestMessage: 'Cảm ơn bạn đã thông báo sự cố. Sẽ xử lý ngay',
+    lastUpdated: '14/2/2024 11:00',
+    status: 'resolved',
+  },
+]
