@@ -59,6 +59,7 @@ export interface PublicUser {
   name: string
   email?: string
   phone?: string
+  userType: 'landlord' | 'tenant' | 'customer'
   status: 'active' | 'suspended'
   joinedDate: string
   views: number
@@ -365,6 +366,7 @@ export const mockPublicUsers: PublicUser[] = [
     name: 'Ngô Thị Hoa',
     email: 'hoa.ngo@example.com',
     phone: '0944444444',
+    userType: 'landlord',
     status: 'active',
     joinedDate: '2024-01-15',
     views: 23,
@@ -376,6 +378,7 @@ export const mockPublicUsers: PublicUser[] = [
     name: 'Đặng Văn Minh',
     email: 'minh.dang@example.com',
     phone: '0955555555',
+    userType: 'tenant',
     status: 'active',
     joinedDate: '2023-11-08',
     views: 45,
@@ -387,6 +390,7 @@ export const mockPublicUsers: PublicUser[] = [
     name: 'Chu Thị Phương',
     email: 'phuong.chu@example.com',
     phone: '0966666666',
+    userType: 'customer',
     status: 'suspended',
     joinedDate: '2024-01-01',
     views: 128,
