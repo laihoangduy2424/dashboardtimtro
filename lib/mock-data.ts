@@ -37,6 +37,8 @@ export interface Room {
   reviewStatus?: 'pending' | 'approved' | 'rejected'
   image?: string
   createdDate: string
+  approvedDate?: string
+  deletedDate?: string
   views?: number
   listingDate?: string
 }
@@ -231,6 +233,7 @@ export const mockRooms: Room[] = [
     publicStatus: 'displaying',
     reviewStatus: 'approved',
     createdDate: '2024-01-20',
+    approvedDate: '2024-01-21',
     listingDate: '2024-01-22',
     views: 145,
   },
@@ -248,6 +251,7 @@ export const mockRooms: Room[] = [
     publicStatus: 'rented',
     reviewStatus: 'approved',
     createdDate: '2023-11-15',
+    approvedDate: '2023-11-16',
     listingDate: '2023-11-18',
     views: 312,
   },
@@ -265,6 +269,7 @@ export const mockRooms: Room[] = [
     publicStatus: 'displaying',
     reviewStatus: 'approved',
     createdDate: '2024-02-01',
+    approvedDate: '2024-02-01',
     listingDate: '2024-02-02',
     views: 89,
   },
@@ -282,6 +287,8 @@ export const mockRooms: Room[] = [
     publicStatus: 'hidden',
     reviewStatus: 'approved',
     createdDate: '2023-12-10',
+    approvedDate: '2023-12-11',
+    deletedDate: '2024-02-12',
     listingDate: '2023-12-12',
     views: 0,
   },
