@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { mockPublicUsers, PublicUser } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, Lock, Trash2 } from 'lucide-react'
+import { Eye } from 'lucide-react'
 
 export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null)
@@ -17,7 +17,7 @@ export default function UsersPage() {
       header: 'ID',
       accessor: 'id',
       sortable: true,
-      className: 'w-24',
+      className: 'w-24 font-semibold',
     },
     {
       header: 'Tên',
@@ -30,11 +30,16 @@ export default function UsersPage() {
       sortable: true,
     },
     {
-      header: 'Điện thoại',
-      accessor: 'phone',
+      header: 'Loại tài khoản',
+      accessor: 'userType',
+      render: (value) => {
+        if (value === 'landlord') return <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">Chủ nhà</span>
+        if (value === 'tenant') return <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">Cư dân</span>
+        return <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">Khách</span>
+      },
     },
     {
-      header: 'Tình trạng tài khoản',
+      header: 'Trạng thái',
       accessor: 'status',
       render: (value) => {
         const statusVariant = value === 'active' ? 'success' : 'error'
@@ -43,21 +48,9 @@ export default function UsersPage() {
       sortable: true,
     },
     {
-      header: 'Lượt xem',
-      accessor: 'views',
-      render: (value) => value,
-      sortable: true,
-    },
-    {
-      header: 'Số liên hệ',
-      accessor: 'contactCount',
-      render: (value) => value,
-      sortable: true,
-    },
-    {
       header: 'Ngày tham gia',
       accessor: 'joinedDate',
-      render: (value) => new Date(value).toLocaleDateString(),
+      render: (value) => new Date(value).toLocaleDateString('vi-VN'),
       sortable: true,
     },
   ]
@@ -67,160 +60,134 @@ export default function UsersPage() {
     setIsModalOpen(true)
   }
 
-  const handleSuspend = (user: PublicUser) => {
-    console.log('Suspending user:', user.id)
-    // TODO: Call API to suspend user
-  }
-
-  const handleDelete = (user: PublicUser) => {
-    console.log('Deleting user:', user.id)
-    // TODO: Call API to delete user
-  }
-
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Người dùng trang công khai</h1>
-        <p className="mt-1 text-muted-foreground">Quản lý người dùng tìm phòng trên trang công khai</p>
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold text-foreground">Danh sách người dùng</h1>
+        <p className="text-sm text-muted-foreground">Tổng cộng {mockPublicUsers.length} người dùng</p>
       </div>
 
-      {/* Data Table */}
-      <div className="rounded-lg border border-border bg-card p-6">
+      {/* Table */}
+      <div className="rounded-lg border border-border bg-card">
         <DataTable<PublicUser>
           data={mockPublicUsers}
           columns={columns}
-          searchPlaceholder="Tìm người dùng theo tên hoặc email..."
-          searchableFields={['name', 'email', 'phone']}
-          onRowClick={handleViewDetails}
+          searchPlaceholder="Tìm người dùng theo ID, tên hoặc email..."
+          searchableFields={['id', 'name', 'email']}
           actions={(user) => (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleViewDetails(user)}
-                className="text-muted-foreground hover:text-foreground"
-                title="Xem chi tiết"
-              >
-                <Eye size={16} />
-              </Button>
-              {user.status === 'active' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSuspend(user)}
-                    className="text-orange-600 hover:text-orange-700"
-                    title="Khoá tài khoản"
-                  >
-                    <Lock size={16} />
-                  </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(user)}
-                className="text-red-600 hover:text-red-700"
-                title="Xóa tài khoản"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleViewDetails(user)}
+              className="gap-2 text-primary hover:bg-primary/10"
+            >
+              <Eye size={16} />
+              <span className="hidden sm:inline">Xem</span>
+            </Button>
           )}
         />
       </div>
 
-      {/* Details Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Chi tiết người dùng</DialogTitle>
-            <DialogDescription>Xem và quản lý tài khoản người dùng trang công khai</DialogDescription>
-          </DialogHeader>
+      {/* Detail Modal */}
+      {selectedUser && (
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Chi tiết người dùng</DialogTitle>
+              <DialogDescription>Thông tin chi tiết về người dùng #{selectedUser.id}</DialogDescription>
+            </DialogHeader>
 
-          {selectedUser && (
-            <div className="space-y-6">
-              {/* User Information */}
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Thông tin người dùng</h3>
-                <div className="grid gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tên</p>
-                    <p className="text-foreground">{selectedUser.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p className="text-foreground">{selectedUser.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Điện thoại</p>
-                    <p className="text-foreground">{selectedUser.phone || 'N/A'}</p>
-                  </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">ID</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{selectedUser.id}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Tên</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{selectedUser.name}</p>
                 </div>
               </div>
 
-              {/* Account Status */}
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Tình trạng tài khoản</h3>
-                <div className="grid gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Trạng thái</p>
-                    <div className="mt-1">
-                      <StatusBadge
-                        status={selectedUser.status}
-                        variant={selectedUser.status === 'active' ? 'success' : 'error'}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Ngày tham gia</p>
-                    <p className="text-foreground">{new Date(selectedUser.joinedDate).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Hoạt động gần nhất</p>
-                    <p className="text-foreground">{new Date(selectedUser.lastActive).toLocaleDateString()}</p>
-                  </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{selectedUser.email || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Điện thoại</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{selectedUser.phone || 'N/A'}</p>
                 </div>
               </div>
 
-              {/* Activity Statistics */}
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Thống kê hoạt động</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium text-muted-foreground">Lượt xem phòng</p>
-                    <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.views}</p>
-                  </div>
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium text-muted-foreground">Số liên hệ đã thực hiện</p>
-                    <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.contactCount}</p>
-                  </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Loại tài khoản</p>
+                  <p className="mt-1">
+                    {selectedUser.userType === 'landlord' && (
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                        Chủ nhà
+                      </span>
+                    )}
+                    {selectedUser.userType === 'tenant' && (
+                      <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
+                        Cư dân
+                      </span>
+                    )}
+                    {selectedUser.userType === 'customer' && (
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                        Khách
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Trạng thái</p>
+                  <p className="mt-1">
+                    <StatusBadge
+                      status={selectedUser.status}
+                      variant={selectedUser.status === 'active' ? 'success' : 'error'}
+                    />
+                  </p>
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2 pt-4">
-                {selectedUser.status === 'active' && (
-                  <Button
-                    onClick={() => handleSuspend(selectedUser)}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700"
-                  >
-                    <Lock size={16} className="mr-2" />
-                    Khoá tài khoản
-                  </Button>
-                )}
-                <Button
-                  onClick={() => handleDelete(selectedUser)}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Xóa tài khoản
-                </Button>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Ngày tham gia</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {new Date(selectedUser.joinedDate).toLocaleDateString('vi-VN')}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Hoạt động gần nhất</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {new Date(selectedUser.lastActive).toLocaleDateString('vi-VN')}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Trạng thái tài khoản</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {selectedUser.status === 'active' ? 'Hoạt động' : 'Bị khoá'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-sm font-medium text-muted-foreground">Lượt xem phòng</p>
+                  <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.views}</p>
+                </div>
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-sm font-medium text-muted-foreground">Số liên hệ đã thực hiện</p>
+                  <p className="mt-1 text-2xl font-bold text-foreground">{selectedUser.contactCount}</p>
+                </div>
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
