@@ -81,6 +81,47 @@ export interface Report {
   adminNotes?: string
 }
 
+// Chatbot types
+export interface ChatbotModel {
+  id: string
+  name: string
+  description: string
+  contextWindow: number
+}
+
+export interface SamplePrompt {
+  id: string
+  title: string
+  description: string
+  category: string
+  tokenCount: number
+}
+
+export interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+  tokens?: number
+}
+
+export interface Conversation {
+  id: string
+  title: string
+  model: string
+  createdDate: string
+  lastModified: string
+  messages: ChatMessage[]
+  totalTokens: number
+}
+
+export interface TokenInfo {
+  totalUsed: number
+  limit: number
+  percentageUsed: number
+  costPerMillion: number
+}
+
 // ==================== MOCK DATA ====================
 
 // Mock Landlords (SaaS Customers)
@@ -488,4 +529,146 @@ export const mockChartData = {
     { day: 'Sat', views: 356 },
     { day: 'Sun', views: 198 },
   ],
+}
+
+// ==================== CHATBOT MOCK DATA ====================
+
+export const mockChatbotModels: ChatbotModel[] = [
+  {
+    id: 'gpt-4',
+    name: 'GPT-4',
+    description: 'Most capable model, best for complex tasks',
+    contextWindow: 8192,
+  },
+  {
+    id: 'gpt-3.5',
+    name: 'GPT-3.5 Turbo',
+    description: 'Fast and efficient, good balance',
+    contextWindow: 4096,
+  },
+  {
+    id: 'claude-3',
+    name: 'Claude 3 Opus',
+    description: 'Strong reasoning and analysis',
+    contextWindow: 200000,
+  },
+  {
+    id: 'gemini-pro',
+    name: 'Gemini Pro',
+    description: 'Multimodal capabilities',
+    contextWindow: 32000,
+  },
+]
+
+export const mockSamplePrompts: SamplePrompt[] = [
+  {
+    id: 'sp-1',
+    title: 'Thông tin bài đăng',
+    description: 'Room details, amenities, location, and rental terms',
+    category: 'listing_info',
+    tokenCount: 1,
+  },
+  {
+    id: 'sp-2',
+    title: 'Câu hỏi thường gặp',
+    description: 'Common questions about booking, payment, and policies',
+    category: 'faq',
+    tokenCount: 2,
+  },
+  {
+    id: 'sp-3',
+    title: 'Chính sách thuê phòng',
+    description: 'Tenant responsibilities, quiet hours, and restrictions',
+    category: 'rules',
+    tokenCount: 3,
+  },
+  {
+    id: 'sp-4',
+    title: 'Hướng dẫn thanh toán',
+    description: 'Payment methods, schedules, and procedures',
+    category: 'payment',
+    tokenCount: 2,
+  },
+  {
+    id: 'sp-5',
+    title: 'Dịch vụ hỗ trợ',
+    description: 'Support channels and response times',
+    category: 'support',
+    tokenCount: 1,
+  },
+]
+
+export const mockConversations: Conversation[] = [
+  {
+    id: 'conv-1',
+    title: 'Thảo luận về giá thuê',
+    model: 'gpt-4',
+    createdDate: '2024-02-14',
+    lastModified: '2024-02-16',
+    messages: [
+      {
+        id: 'msg-1',
+        role: 'user',
+        content: 'Giá thuê phòng hiện tại có phải là thị trường không?',
+        timestamp: '2024-02-14T10:30:00Z',
+        tokens: 15,
+      },
+      {
+        id: 'msg-2',
+        role: 'assistant',
+        content: 'Dựa trên dữ liệu thị trường, giá thuê phòng của bạn đang ở mức trung bình với các tiện ích được cung cấp. Tôi khuyên bạn nên xem xét các yếu tố như vị trí, kích thước và các tiện ích được cung cấp.',
+        timestamp: '2024-02-14T10:31:00Z',
+        tokens: 45,
+      },
+    ],
+    totalTokens: 60,
+  },
+  {
+    id: 'conv-2',
+    title: 'Tối ưu hóa mô tả phòng',
+    model: 'gpt-3.5',
+    createdDate: '2024-02-10',
+    lastModified: '2024-02-15',
+    messages: [
+      {
+        id: 'msg-3',
+        role: 'user',
+        content: 'Làm thế nào để viết mô tả phòng hấp dẫn hơn?',
+        timestamp: '2024-02-10T14:20:00Z',
+        tokens: 12,
+      },
+      {
+        id: 'msg-4',
+        role: 'assistant',
+        content: 'Hãy tập trung vào những điểm bán chính: vị trí, ánh sáng tự nhiên, tiện ích gần đó, và độc đáo của không gian.',
+        timestamp: '2024-02-10T14:21:00Z',
+        tokens: 38,
+      },
+    ],
+    totalTokens: 50,
+  },
+  {
+    id: 'conv-3',
+    title: 'Quản lý khách hàng mới',
+    model: 'claude-3',
+    createdDate: '2024-02-05',
+    lastModified: '2024-02-12',
+    messages: [
+      {
+        id: 'msg-5',
+        role: 'user',
+        content: 'Quy trình onboarding khách hàng mới nên là gì?',
+        timestamp: '2024-02-05T09:00:00Z',
+        tokens: 14,
+      },
+    ],
+    totalTokens: 14,
+  },
+]
+
+export const mockTokenInfo: TokenInfo = {
+  totalUsed: 124,
+  limit: 1000000,
+  percentageUsed: 0.0124,
+  costPerMillion: 15,
 }
